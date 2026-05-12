@@ -15,11 +15,27 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            // Nivel 0 (Tablas Maestras)
+            RoleSeeder::class,
+            SubjectSeeder::class,
+            
+            // Nivel 1 (Dependen de Roles)
+            UserSeeder::class,
+            
+            // Nivel 2 (Intersecciones/Relaciones)
+            UserRequestSeeder::class,
+            MonitorSeeder::class,
+            
+            // Nivel 3 (Dependen de Monitor)
+            ScheduleSeeder::class,
+            
+            // Nivel 4 (Dependen de Schedule)
+            MonitorSessionSeeder::class,
+            
+            // Nivel 5 (Dependen de Session)
+            AttendanceSeeder::class,
+            FeedbackSeeder::class,
         ]);
     }
 }

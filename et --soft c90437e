@@ -1,0 +1,46 @@
+[33m97940c5[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m fix: Corrige Error de Fillable en Attendance.php
+[33ma0f868e[m fix: Corrige Error de Fillable en Monitor.php
+[33maad2ce7[m fix: Corrige Error en Relacion Subject con UserRequest
+[33m99c8b98[m fix: Corrige fillable de Subject.php
+[33m2331eec[m fix: Corrige importacion modelos a User.php
+[33mc90437a[m[33m ([m[1;31morigin/main[m[33m)[m feat: Agregar relaciones e importar modelos a User
+[33mde529d4[m feat: Agregar relaciones e importar modelos a Monitor
+[33mdf2d20e[m feat: Agregar relaciones e importar modelos a Schedule
+[33mdea0fb0[m feat: Agregar relaciones e importar modelos a MonitorSession
+[33mb15abee[m feat: Agregar relaciones e importar modelos a Attendance
+[33mc60e2cc[m feat: Agregar relaciones e importar modelos a Feedback
+[33ma8c98d9[m feat: Importar Modelos a Subject
+[33md494b57[m feat: Importar Modelos a UserRequest
+[33m893c44b[m feat: Agregar Relaciones en Subject
+[33m7ee4383[m feat: Agregar Relaciones en UserRequest
+[33mbe376b8[m feat: Editar fillable en Modelo Attendance
+[33m337187f[m feat: Editar fillable en Modelo Feedback
+[33ma2f0185[m feat: Editar fillable en Modelo Monitor_Session
+[33mcf22f26[m feat: Editar fillable en Modelo Schedule
+[33m64dfcce[m feat: Editar fillable en Modelo Monitor
+[33ma8d8629[m feat: Editar fillable en Modelo UserRequest
+[33md12b714[m feat: Editar fillable en Modelo Subject
+[33m1f3fa90[m feat: Editar fillable en Modelo Role
+[33m1122457[m feat: Agregar Atributos table feedback
+[33mb4556a2[m feat: Agregar Atributos table Attendances
+[33mc612676[m feat: Agregar Atributos table User_requests
+[33m0c3247d[m feat: Agregar Atributos table Schedules
+[33m57a521f[m feat: Agregar Atributos table Monitor
+[33m4055a3f[m feat: Agregar Atributos table Subjects
+[33m56b937c[m fix: corregir error en migración role_user (unsignedBigInteger)
+[33mdb168d7[m feat: Agregar relacion de Users en el modelo Role.php
+[33mdf29ab6[m feat: Agregar relacion de roles en el modelo User.php
+[33m1d149ba[m feat: llaves foraneas en table role_user
+[33madde522[m feat: Campo name en table Roles
+[33mc39637e[m Creacion Migracion  role_user_table
+[33m497af3b[m Creacion modelo Feedback -m
+[33m10a5863[m Creacion modelo Attendance -m
+[33m34eb39a[m Creacion modelo UserRequest -m
+[33m5032901[m Creacion modelo MonitorSession -m
+[33mb810f02[m Creacion modelo Schedule -m
+[33md17d59b[m Creacion modelo Monitor -m
+[33m6340be5[m Creacion modelo Subject -m
+[33m200e2d9[m Creacion modelo Role -m
+[33m1c7aead[m Agregacion Campo Estado en Modelo Users apartado fillable
+[33m05956b8[m Agregacion Campo Estado en Migracion de Users
+[33mb391fad[m Inicializa proyecto Laravel
