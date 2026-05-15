@@ -4,27 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title')</title>
+    <title>@yield('title', 'Sistema de Gestión de Monitorias')</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    @stack('styles')
 </head>
 
 <body class="bg-dark text-light">
 
-<!DOCTYPE html>
+    <div class="d-flex flex-column min-vh-100">
 
-<html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Sistema de Gestión de Monitorias')</title>
-
-
-</head>
-
-<body class="bg-dark text-light d-flex flex-column min-vh-100">
-
-```
     <!-- HEADER -->
     <header class="bg-success text-white shadow">
         <div class="container py-4">
@@ -77,7 +65,7 @@
     </nav>
 
     <!-- CONTENIDO PRINCIPAL -->
-    <main class="container my-5 flex-grow-1">
+    <main class="container my-5 grow">
 
         @yield('content')
 
@@ -100,12 +88,7 @@
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    ```
-
-</body>
-
-</html>
-
+    </div>
 
 </body>
 

@@ -3,20 +3,16 @@
 namespace App\Http\Controllers;
 use App\Models\Schedule;
 use App\Models\Monitor;
-
 use Illuminate\Http\Request;
 
 class ScheduleController extends Controller
 {
 
-
     public function index()
     {
-        $schedules = Schedule::with('monitor.user')->get();
-
+        $schedules = Schedule::with('monitor.user')->paginate(10);
         return view('schedules.index', compact('schedules'));
     }
-
     public function create()
     {
         $monitors = Monitor::with('user')->get();

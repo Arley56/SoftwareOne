@@ -9,8 +9,7 @@ class MonitorSessionController extends Controller
 {
     public function index()
     {
-        $sessions = MonitorSession::with('schedule.monitor.user')->get();
-
+        $sessions = MonitorSession::with('schedule.monitor.user')->paginate(10);
         return view('monitor_sessions.index', compact('sessions'));
     }
 

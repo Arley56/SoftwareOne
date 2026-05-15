@@ -5,8 +5,6 @@ use App\Models\Attendance;
 use App\Models\User;
 use App\Models\MonitorSession;
 use App\Models\Subject;
-
-
 use Illuminate\Http\Request;
 
 class AttendanceController extends Controller
@@ -14,7 +12,7 @@ class AttendanceController extends Controller
 
     public function index()
     {
-        $attendances = Attendance::with(['MonitorSession'])->get();
+        $attendances = Attendance::with(['MonitorSession'])->paginate(10);
         return view('attendances.index', compact('attendances'));
     }
 

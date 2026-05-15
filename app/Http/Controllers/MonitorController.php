@@ -19,7 +19,6 @@ class MonitorController extends Controller
         $monitors = Monitor::with('user')->paginate(15);
         $subjects = Subject::all();
         return view('monitors.index', compact('monitors', 'subjects'));
-
     }
 
     /**
@@ -74,7 +73,7 @@ class MonitorController extends Controller
     /**
      * Update the specified resource in storage.
      */
-public function update(Request $request, string $id)
+    public function update(Request $request, string $id)
     {
         // 1. Validamos los datos que llegan del formulario
         $request->validate([

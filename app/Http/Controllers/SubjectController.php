@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 use App\Models\Subject;
-
 use Illuminate\Http\Request;
 
 class SubjectController extends Controller
@@ -10,7 +9,7 @@ class SubjectController extends Controller
    
     public function index()
     {
-        $subjects = Subject::all();
+        $subjects = Subject::paginate(10);
         return view('subjects.index', compact('subjects'));
     }
 
@@ -18,7 +17,6 @@ class SubjectController extends Controller
     {
         return view('subjects.create');
     }
-
 
     public function store(Request $request)
     {
