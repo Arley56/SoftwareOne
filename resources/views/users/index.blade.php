@@ -122,6 +122,7 @@
                         <tr>
                             <th class="ps-4">ID</th>
                             <th>Nombre</th>
+                            <th>Foto</th>
                             <th>Email</th>
                             <th>Estado</th>
                             <th class="text-center pe-4">Acciones</th>
@@ -140,6 +141,17 @@
 
                                 <td>
                                     {{ $user->name }}
+                                </td>
+                                <td>
+                                    @if($user->photo)
+                                        <img src="{{ asset('storage/' . $user->photo) }}"
+                                            width="45"
+                                            height="45"
+                                            class="rounded-circle"
+                                            style="object-fit: cover;">
+                                    @else
+                                        <span class="text-secondary small">Sin foto</span>
+                                    @endif
                                 </td>
 
                                 <td>

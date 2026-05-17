@@ -27,6 +27,7 @@ class ScheduleController extends Controller
             'hora_inicio' => 'required',
             'hora_fin' => 'required',
             'modalidad' => 'required',
+            'salon'=>'nullable|string|max:20',
         ]);
 
         Schedule::create($request->all());
@@ -57,6 +58,7 @@ class ScheduleController extends Controller
         $schedule->hora_inicio = $request->input('hora_inicio');
         $schedule->hora_fin = $request->input('hora_fin');
         $schedule->modalidad = $request->input('modalidad');
+        $schedule->salon = $request->input('salon');
         $schedule->save();
         return redirect()->route('schedules.index')->with('success', 'Schedule updated successfully.');
     }

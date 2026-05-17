@@ -6,7 +6,7 @@
 
     <h2 class="text-light mb-4">Editar Usuario</h2>
 
-    <form action="{{ route('users.update', $user->id) }}" method="POST">
+    <form action="{{ route('users.update', $user->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
 
@@ -31,6 +31,53 @@
                 <option value="activo" {{ $user->estado == 'activo' ? 'selected' : '' }}>Activo</option>
                 <option value="inactivo" {{ $user->estado == 'inactivo' ? 'selected' : '' }}>Inactivo</option>
             </select>
+        </div>
+        <div class="mb-3">
+
+            <label class="form-label">
+                Foto actual
+            </label>
+
+            <br>
+
+            @if($user->photo)
+
+                <img
+                    src="{{ asset('storage/' . $user->photo) }}"
+                    width="120"
+                    height="120"
+                    class="rounded-circle mb-3"
+                    style="object-fit: cover;"
+                >
+
+            @else
+
+                <p class="text-secondary">
+                    El usuario no tiene foto.
+                </p>
+
+            @endif
+
+        </div>
+        <div class="mb-3">
+
+            <label class="form-label">
+                Cambiar foto de perfil
+            </label>
+
+            <input
+                type="file"
+                name="photo"
+                class="form-control"
+                accept=".jpg,.jpeg,.png"
+            >
+
+            @error('photo')
+                <div class="text-danger mt-1">
+                    {{ $message }}
+                </div>
+            @enderror
+
         </div>
 
         <button type="submit" class="btn btn-primary">

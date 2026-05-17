@@ -126,6 +126,8 @@
                             <th>Hora inicio</th>
                             <th>Hora fin</th>
                             <th>Modalidad</th>
+                            <th>salon</th>
+
                             <th class="text-center pe-4">Acciones</th>
                         </tr>
                     </thead>
@@ -166,6 +168,18 @@
                                     <span class="badge rounded-pill px-3 py-2 bg-info text-dark">
                                         {{ ucfirst($schedule->modalidad) }}
                                     </span>
+                                </td>
+                                
+                                <td>
+                                    @if(strtolower($schedule->modalidad) == 'presencial')
+
+                                        {{ $schedule->salon ?? 'Sin asignar' }}
+
+                                    @else
+
+                                        <span class="text-secondary">No aplica</span>
+
+                                    @endif
                                 </td>
 
                                 <td class="text-center pe-4">

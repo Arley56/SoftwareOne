@@ -12,7 +12,7 @@ class Schedule extends Model
 {
     use SoftDeletes;
     use HasFactory;
-    protected $fillable = ['monitor_id','dia_semana','hora_inicio','hora_fin','modalidad'];
+    protected $fillable = ['monitor_id','dia_semana','hora_inicio','hora_fin','modalidad','salon'];
     public function monitor()
     {
         return $this->belongsTo(Monitor::class, 'monitor_id');

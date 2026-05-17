@@ -91,6 +91,20 @@
                     </option>
                 </select>
             </div>
+
+            <div class="mb-3">
+                <label for="salon" class="form-label">Salón</label>
+
+                <input
+                    type="text"
+                    name="salon"
+                    id="salon"
+                    class="form-control"
+                    value="{{ $schedule->salon }}"
+                    placeholder="Ej: X104"
+                >
+            </div>
+            
             <button type="submit" class="btn btn-success">
                 Actualizar
             </button>

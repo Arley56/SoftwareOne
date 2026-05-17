@@ -16,7 +16,7 @@ use App\Models\Attendance;
 use App\Models\Feedback;
 use App\Models\Role;
 
-#[Fillable(['name', 'email', 'password', 'estado'])]
+#[Fillable(['name', 'email', 'password', 'estado','photo'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {

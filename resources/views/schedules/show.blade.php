@@ -60,6 +60,21 @@
                     @endif
                 </td>
             </tr>
+            <tr>
+                <th>Salón</th>
+
+                <td>
+                    @if($schedule->modalidad == 'presencial')
+
+                        {{ $schedule->salon ?? 'Sin asignar' }}
+
+                    @else
+
+                        No aplica
+
+                    @endif
+                </td>
+            </tr>
 
         </table>
 

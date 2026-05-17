@@ -6,7 +6,7 @@
 
 <h2 class="text-light mb-4">Crear Usuario</h2>
 
-<form action="{{ route('users.store') }}" method="POST">
+<form action="{{ route('users.store') }}" method="POST" enctype="multipart/form-data">
     @csrf
 
     <div class="mb-3">
@@ -70,6 +70,26 @@
         @error('estado')
             <div class="text-danger mt-1">{{ $message }}</div>
         @enderror
+    </div>
+    <div class="mb-3">
+
+        <label class="form-label">
+            Foto de perfil
+        </label>
+
+        <input
+            type="file"
+            name="photo"
+            class="form-control"
+            accept=".jpg,.jpeg,.png"
+        >
+
+        @error('photo')
+            <div class="text-danger mt-1">
+                {{ $message }}
+            </div>
+        @enderror
+
     </div>
 
     <button type="submit" class="btn btn-success">

@@ -34,6 +34,10 @@ class ScheduleSeeder extends Seeder
                 'hora_inicio' => $horas[$i % 4],
                 'hora_fin'    => date('H:i:s', strtotime($horas[$i % 4] . ' + 2 hours')),
                 'modalidad'   => ($i % 2 == 0) ? 'Presencial' : 'Virtual',
+                
+                'salon' => ($i % 2 == 0)
+                    ? ['A101', 'B202', 'X104', 'C305', 'D210'][$i % 5]
+                    : null,
                 'created_at'  => now(),
                 'updated_at'  => now(),
             ];

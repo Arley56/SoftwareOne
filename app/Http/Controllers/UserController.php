@@ -29,6 +29,7 @@ class UserController extends Controller
         $user = new User();
         $request->validate([
         'role_id' => 'required|exists:roles,id',
+        'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
 
         $user->name = $request->name;
@@ -36,6 +37,12 @@ class UserController extends Controller
         $user->password = bcrypt($request->password);
         $user->estado = $request->estado;
         $user->role_id = $request->role_id;
+        if ($request->hasFile('photo')) {
+
+            $path = $request->file('photo')->store('profiles', 'public');
+
+            $user->photo = $path;
+        }
 
         $user->save();
         return redirect()->route('users.index');
@@ -62,8 +69,16 @@ class UserController extends Controller
         $user->email = $request->email;
         $user->password = bcrypt($request->password);
         $user->estado = $request->estado;
+        if ($request->hasFile('photo')) {
+
+            $path = $request->file('photo')->store('profiles', 'public');
+
+            $user->photo = $path;
+        }
         $request->validate([
-        'estado' => 'required|in:activo,inactivo'
+        'estado' => 'required|in:activo,inactivo',
+
+        'photo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
         $user->save();
         return redirect()->route('users.index');

@@ -58,6 +58,17 @@
                     <option value="virtual">Virtual</option>
                 </select>
             </div>
+            <div class="mb-3">
+                <label for="salon" class="form-label">Salón</label>
+
+                <input
+                    type="text"
+                    name="salon"
+                    id="salon"
+                    class="form-control"
+                    placeholder="Ej: X104"
+                >
+            </div>
 
             <button type="submit" class="btn btn-primary">
                 Guardar
