@@ -15,9 +15,10 @@ use App\Models\UserRequest;
 use App\Models\Attendance;
 use App\Models\Feedback;
 use App\Models\Role;
-
-#[Fillable(['name', 'email', 'password', 'estado','photo'])]
+#[Fillable(['name', 'email', 'password', 'estado', 'photo', 'role_id', 'phone'])]
 #[Hidden(['password', 'remember_token'])]
+
+
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */

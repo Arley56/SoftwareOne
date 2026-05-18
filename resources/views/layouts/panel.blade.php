@@ -54,7 +54,7 @@
                         <a class="nav-link" href="{{ route('attendances.index') }}">Asistencias</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('monitor_sessions.index') }}">Sesión de Monitorias</a>
+                        <a class="nav-link" href="{{ route('monitor-sessions.index') }}">Sesión de Monitorias</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('roles.index') }}">Roles</a>
