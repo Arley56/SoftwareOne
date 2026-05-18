@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Monitor; 
+use App\Models\Monitor;
 use App\Models\User;
 use App\Models\Subject;
 use App\Models\Role;
@@ -37,12 +37,12 @@ class MonitorController extends Controller
     public function store(Request $request)
     {
         $monitor = new Monitor();
-        $monitor-> semestre =$request->semestre_monitor;
+        $monitor->semestre = $request->semestre_monitor;
         $monitor->user_id = $request->user_id;
         $monitor->subject_id = $request->subject_id;
         $monitor->user->estado = $request->estado;
-        $monitor -> save();
-        return Redirect()-> route('monitors.index');
+        $monitor->save();
+        return Redirect()->route('monitors.index');
     }
 
     /**
@@ -61,13 +61,13 @@ class MonitorController extends Controller
         $monitor = Monitor::find($id);
         $subjects = Subject::all();
         $users = User::where(function ($query) {
-                        // Condición 1: No tener monitores Y estar Activo
-                        $query->whereDoesntHave('monitors')
-                            ->where('estado', 'Activo'); // Ajusta 'Activo' al valor exacto de tu BD
-                    })
-                    ->orWhere('id', $monitor->user_id) // Condición 2: O ser el monitor actual
-                    ->get();
-        return view('monitors.edit', compact('monitor', 'subjects','users'));
+            // Condición 1: No tener monitores Y estar Activo
+            $query->whereDoesntHave('monitors')
+                ->where('estado', 'Activo'); // Ajusta 'Activo' al valor exacto de tu BD
+        })
+            ->orWhere('id', $monitor->user_id) // Condición 2: O ser el monitor actual
+            ->get();
+        return view('monitors.edit', compact('monitor', 'subjects', 'users'));
     }
 
     /**
@@ -75,30 +75,22 @@ class MonitorController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // 1. Validamos los datos que llegan del formulario
         $request->validate([
-            'user_id'          => 'required|exists:users,id',
-            'subject_id'       => 'required|exists:subjects,id',
-            'semestre_monitor' => 'required|string|max:50', // Ajusta las reglas según tu base de datos
+            'user_id' => 'required|exists:users,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'semestre_monitor' => 'required|string|max:50',
+            'description' => 'nullable|string|max:1000'
         ]);
 
-        // 2. Buscamos el monitor
         $monitor = Monitor::findOrFail($id);
-        
-        // 3. Actualizamos únicamente los campos de la tabla monitors
-        $monitor->user_id    = $request->user_id;
-        $monitor->subject_id = $request->subject_id;
-        $monitor->semestre   = $request->semestre_monitor;
 
-        // Guardamos todo con una sola llamada a la base de datos
+        $monitor->user_id = $request->user_id;
+        $monitor->subject_id = $request->subject_id;
+        $monitor->semestre = $request->semestre_monitor;
+        $monitor->description = $request->description;
+
         $monitor->save();
 
-        /* * NOTA: Ya no hacemos $monitor->user->name = ... 
-         * porque los datos del usuario (nombre, correo) deben editarse 
-         * desde su propio panel de usuarios, no desde la edición del monitor.
-         */
-
-        // 4. Redirigimos con éxito
         return redirect()
             ->route('monitors.index')
             ->with('success', 'Monitor actualizado correctamente');
