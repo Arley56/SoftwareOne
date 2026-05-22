@@ -2,6 +2,9 @@
 
 namespace Tests\Feature;
 
+use App\Models\Monitor;
+use App\Models\Role;
+use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -41,6 +44,51 @@ class ProfileTest extends TestCase
         $this->assertSame('Test User', $user->name);
         $this->assertSame('test@example.com', $user->email);
         $this->assertNull($user->email_verified_at);
+    }
+
+    public function test_monitor_profile_information_can_be_updated(): void
+    {
+        $monitorRole = Role::query()->firstOrCreate(['name' => 'Monitor']);
+        $user = User::factory()->create(['role_id' => $monitorRole->id]);
+        $initialSubject = Subject::create([
+            'name' => 'Programación I',
+            'code' => 'PRG012-' . uniqid(),
+            'credits' => 3,
+        ]);
+        $updatedSubject = Subject::create([
+            'name' => 'Bases de Datos',
+            'code' => 'DBD001-' . uniqid(),
+            'credits' => 3,
+        ]);
+
+        Monitor::create([
+            'user_id' => $user->id,
+            'subject_id' => $initialSubject->id,
+            'semestre' => '8',
+            'description' => 'Descripción anterior',
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->patch('/profile', [
+                'name' => 'Test User',
+                'email' => 'test@example.com',
+                'subject_id' => $updatedSubject->id,
+                'description' => 'Descripción nueva',
+            ]);
+
+        $response
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/profile');
+
+        $user->refresh();
+        $monitor = $user->monitorProfile()->first();
+
+        $this->assertSame('Test User', $user->name);
+        $this->assertSame('test@example.com', $user->email);
+        $this->assertNotNull($monitor);
+        $this->assertSame($updatedSubject->id, $monitor->subject_id);
+        $this->assertSame('Descripción nueva', $monitor->description);
     }
 
     public function test_email_verification_status_is_unchanged_when_the_email_address_is_unchanged(): void

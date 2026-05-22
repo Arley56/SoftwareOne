@@ -105,7 +105,7 @@
                 </p>
             </div>
 
-            <a href="{{ route('monitor_sessions.create') }}"
+            <a href="{{ route('monitor-sessions.create') }}"
             class="btn btn-success px-4 py-2 rounded-pill shadow-sm fw-semibold">
                 + Nueva sesión
             </a>
@@ -158,19 +158,19 @@
                                     <div class="d-flex justify-content-center gap-2 flex-wrap">
 
                                         {{-- VER --}}
-                                        <a href="{{ route('monitor_sessions.show', $session->id) }}"
+                                        <a href="{{ route('monitor-sessions.show', $session->id) }}"
                                         class="btn btn-info btn-sm rounded-pill px-4 fw-semibold">
                                             Ver
                                         </a>
 
                                         {{-- EDITAR --}}
-                                        <a href="{{ route('monitor_sessions.edit', $session->id) }}"
+                                        <a href="{{ route('monitor-sessions.edit', $session->id) }}"
                                         class="btn btn-outline-primary btn-sm rounded-pill px-4 fw-semibold">
                                             Editar
                                         </a>
 
                                         {{-- ELIMINAR --}}
-                                        <form action="{{ route('monitor_sessions.destroy', $session->id) }}"
+                                        <form action="{{ route('monitor-sessions.destroy', $session->id) }}"
                                             method="POST"
                                             class="d-inline">
 

@@ -43,6 +43,11 @@ class User extends Authenticatable
         return $this->hasMany(Monitor::class);
     }
 
+    public function monitorProfile()
+    {
+        return $this->hasOne(Monitor::class);
+    }
+
 
     public function userRequests()
     {

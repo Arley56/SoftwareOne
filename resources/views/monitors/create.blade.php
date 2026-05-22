@@ -42,12 +42,12 @@
                         <div class="mb-3">
                             <label class="form-label">Semestre</label>
                             <select name="semestre_monitor" class="form-select" required>
-                                <option value="" disabled {{ old('semestre_monitor', $monitor->semestre ?? '') == '' ? 'selected' : '' }}>
+                                <option value="" disabled {{ old('semestre_monitor') === null ? 'selected' : '' }}>
                                     Selecciona un semestre...
                                 </option>
                                 
                                 @for ($i = 1; $i <= 10; $i++)
-                                    <option value="{{ $i }}" {{ old('semestre_monitor', $monitor->semestre ?? '') == $i ? 'selected' : '' }}>
+                                    <option value="{{ $i }}" {{ old('semestre_monitor') == $i ? 'selected' : '' }}>
                                         Semestre {{ $i }}
                                     </option>
                                 @endfor

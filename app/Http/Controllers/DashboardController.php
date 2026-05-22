@@ -14,6 +14,7 @@ class DashboardController extends Controller
 {
     public function index(Request $request)
     {
+        $user = $request->user();
         $sessionsQuery = MonitorSession::with(['schedule.monitor.user', 'schedule.monitor.subject'])
             ->orderByDesc('fecha')
             ->orderByDesc('id');
@@ -51,7 +52,7 @@ class DashboardController extends Controller
             ]);
         }
 
-        return view('dashboard', [
+        $dashboardData = [
             'totalUsers' => User::count(),
             'totalMonitors' => Monitor::count(),
             'totalSchedules' => Schedule::count(),
@@ -59,6 +60,12 @@ class DashboardController extends Controller
             'totalAttendances' => Attendance::count(),
             'recentAttendances' => Attendance::with('user')->latest()->take(5)->get(),
             'sessions' => $sessions,
-        ]);
+        ];
+
+        if ($user?->roles?->name === 'Administrador') {
+            return view('dashboard1', $dashboardData);
+        }
+
+        return view('dashboard', $dashboardData);
     }
 }

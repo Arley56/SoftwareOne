@@ -59,7 +59,7 @@
         </tr>
     </table>
 
-    <a href="{{ route('monitor_sessions.index') }}" class="btn btn-secondary">
+    <a href="{{ route('monitor-sessions.index') }}" class="btn btn-secondary">
         Volver
     </a>
 

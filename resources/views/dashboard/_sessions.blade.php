@@ -47,7 +47,7 @@
                         <td>{{ $session->schedule->hora_inicio ?? '' }} - {{ $session->schedule->hora_fin ?? '' }}</td>
                         <td>{{ $session->fecha }}</td>
                         <td>
-                            <a href="{{ route('monitor_sessions.show', $session->id) }}" class="btn btn-info btn-sm">Ver</a>
+                            <a href="{{ route('monitor-sessions.show', $session->id) }}" class="btn btn-info btn-sm">Ver</a>
                         </td>
                     </tr>
                 @empty

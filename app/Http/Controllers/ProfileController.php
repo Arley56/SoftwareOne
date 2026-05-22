@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Subject;
 use App\Http\Requests\ProfileUpdateRequest;
+use Illuminate\Support\Arr;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,8 +18,12 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
+        $monitor = $request->user()->monitorProfile()->with('subject')->first();
+
         return view('profile.edit', [
             'user' => $request->user(),
+            'monitor' => $monitor,
+            'subjects' => Subject::orderBy('name')->get(),
         ]);
     }
 
@@ -26,13 +32,22 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $validated = $request->validated();
+
+        $request->user()->fill(Arr::only($validated, ['name', 'email']));
 
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
 
         $request->user()->save();
+
+        $monitor = $request->user()->monitorProfile()->first();
+
+        if ($monitor !== null) {
+            $monitor->fill(Arr::only($validated, ['subject_id', 'description']));
+            $monitor->save();
+        }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }

@@ -16,6 +16,8 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
+        $hasMonitorProfile = $this->user()?->monitorProfile()->exists() ?? false;
+
         return [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
@@ -26,6 +28,13 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'subject_id' => [
+                Rule::requiredIf($hasMonitorProfile),
+                'nullable',
+                'integer',
+                Rule::exists('subjects', 'id'),
+            ],
+            'description' => ['nullable', 'string', 'max:1000'],
         ];
     }
 }

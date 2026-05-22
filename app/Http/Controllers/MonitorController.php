@@ -16,7 +16,7 @@ class MonitorController extends Controller
      */
     public function index()
     {
-        $monitors = Monitor::with('user')->paginate(15);
+        $monitors = Monitor::with(['user', 'subject'])->paginate(15);
         $subjects = Subject::all();
         return view('monitors.index', compact('monitors', 'subjects'));
     }
@@ -36,12 +36,20 @@ class MonitorController extends Controller
      */
     public function store(Request $request)
     {
-        $monitor = new Monitor();
-        $monitor->semestre = $request->semestre_monitor;
-        $monitor->user_id = $request->user_id;
-        $monitor->subject_id = $request->subject_id;
-        $monitor->user->estado = $request->estado;
-        $monitor->save();
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'subject_id' => 'required|exists:subjects,id',
+            'semestre_monitor' => 'required|string|max:50',
+            'description' => 'nullable|string|max:1000',
+        ]);
+
+        Monitor::create([
+            'semestre' => $request->semestre_monitor,
+            'user_id' => $request->user_id,
+            'subject_id' => $request->subject_id,
+            'description' => $request->description,
+        ]);
+
         return Redirect()->route('monitors.index');
     }
 
@@ -58,7 +66,7 @@ class MonitorController extends Controller
      */
     public function edit(string $id)
     {
-        $monitor = Monitor::find($id);
+        $monitor = Monitor::findOrFail($id);
         $subjects = Subject::all();
         $users = User::where(function ($query) {
             // Condición 1: No tener monitores Y estar Activo
@@ -106,6 +114,6 @@ class MonitorController extends Controller
         $monitor->delete();
 
         return redirect()->route('monitors.index')
-            ->with('success', 'Rol eliminado correctamente.');
+            ->with('success', 'Monitor eliminado correctamente.');
     }
 }

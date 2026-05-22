@@ -6,7 +6,7 @@
 
     <h2 class="text-light mb-4">Editar sesión</h2>
 
-    <form action="{{ route('monitor_sessions.update', $session->id) }}" method="POST">
+    <form action="{{ route('monitor-sessions.update', $session->id) }}" method="POST">
         @csrf
         @method('PUT')
 
@@ -36,7 +36,7 @@
         {{-- BOTONES --}}
         <button class="btn btn-primary">Actualizar</button>
 
-        <a href="{{ route('monitor_sessions.index') }}" class="btn btn-secondary">
+        <a href="{{ route('monitor-sessions.index') }}" class="btn btn-secondary">
             Cancelar
         </a>
     </form>
