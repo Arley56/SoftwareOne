@@ -34,9 +34,14 @@ class AttendanceController extends Controller
             'asistio' => 'required'
         ]);
 
-        Attendance::create($request->all());
+        $data = $request->only(['monitor_session_id', 'user_id', 'asistio']);
 
-        return redirect()->route('attendances.index');
+        Attendance::updateOrCreate(
+            ['monitor_session_id' => $data['monitor_session_id'], 'user_id' => $data['user_id']],
+            ['asistio' => $data['asistio']]
+        );
+
+        return redirect()->route('attendances.index')->with('status', 'Asistencia registrada o actualizada.');
     }
 
 

@@ -28,7 +28,7 @@ class MonitorSessionController extends Controller
 
         MonitorSession::create($request->all());
 
-        return redirect()->route('monitor_sessions.index');
+        return redirect()->route('monitor-sessions.index');
     }
 
     public function show($id)
@@ -55,13 +55,13 @@ class MonitorSessionController extends Controller
         $session = MonitorSession::findOrFail($id);
         $session->update($request->all());
 
-        return redirect()->route('monitor_sessions.index');
+        return redirect()->route('monitor-sessions.index');
     }
 
     public function destroy($id)
     {
         $session = MonitorSession::findOrFail($id);
         $session->delete();
-        return redirect()->route('monitor_sessions.index');
+        return redirect()->route('monitor-sessions.index');
     }
 }
