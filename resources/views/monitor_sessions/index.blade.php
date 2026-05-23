@@ -1,4 +1,4 @@
-@extends('layouts.panel')
+@extends(auth()->user()?->roles?->name === 'Monitor' ? 'layouts.monitor' : 'layouts.panel')
 
 @section('title', 'Sesiones')
 

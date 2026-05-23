@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use App\Models\MonitorSession;
 use App\Models\Schedule;
+use App\Models\SessionMaterial;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 
 class MonitorSessionController extends Controller
@@ -33,8 +35,55 @@ class MonitorSessionController extends Controller
 
     public function show($id)
     {
-        $session = MonitorSession::with('schedule')->findOrFail($id);
+        $session = MonitorSession::with([
+            'schedule.monitor.user',
+            'sessionEnrollments' => function ($query) {
+                $query->where('status', 'activa')->with('user');
+            },
+            'sessionMaterials.uploader',
+        ])->findOrFail($id);
         return view('monitor_sessions.show', compact('session'));
+    }
+
+    public function destroyMaterial(Request $request, MonitorSession $monitorSession, SessionMaterial $sessionMaterial)
+    {
+        abort_unless(
+            $request->user()?->roles?->name === 'Monitor' && $sessionMaterial->monitor_session_id === $monitorSession->id,
+            403
+        );
+
+        Storage::disk('public')->delete($sessionMaterial->file_path);
+        $sessionMaterial->delete();
+
+        return redirect()
+            ->route('monitor-sessions.show', $monitorSession->id)
+            ->with('status', 'Material eliminado correctamente.');
+    }
+
+    public function storeMaterial(Request $request, MonitorSession $monitorSession)
+    {
+        abort_unless($request->user()?->roles?->name === 'Monitor', 403);
+
+        $request->validate([
+            'material' => 'required|file|max:20480',
+        ]);
+
+        $file = $request->file('material');
+        $originalName = $file->getClientOriginalName();
+        $path = $file->storePublicly("monitor-session-materials/{$monitorSession->id}", 'public');
+
+        SessionMaterial::create([
+            'monitor_session_id' => $monitorSession->id,
+            'uploaded_by_user_id' => $request->user()->id,
+            'original_name' => $originalName,
+            'file_path' => $path,
+            'mime_type' => $file->getClientMimeType(),
+            'size' => $file->getSize(),
+        ]);
+
+        return redirect()
+            ->route('monitor-sessions.show', $monitorSession->id)
+            ->with('status', 'Material de apoyo cargado correctamente.');
     }
 
     public function edit($id)

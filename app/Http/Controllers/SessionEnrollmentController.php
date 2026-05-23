@@ -73,10 +73,15 @@ class SessionEnrollmentController extends Controller
             abort(403);
         }
 
+        if (! $isAdmin && $sessionEnrollment->status !== 'activa') {
+            abort(403, 'Solo puedes ver materiales de una inscripción activa.');
+        }
+
         $sessionEnrollment->load([
             'monitorSession.schedule.monitor.subject',
             'monitorSession.schedule.monitor.user',
             'user',
+            'monitorSession.sessionMaterials.uploader',
         ]);
 
         return view('session_enrollments.show', compact('sessionEnrollment'));

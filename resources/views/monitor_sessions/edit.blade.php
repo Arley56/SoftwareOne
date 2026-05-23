@@ -1,4 +1,4 @@
-@extends('layouts.panel')
+@extends(auth()->user()?->roles?->name === 'Monitor' ? 'layouts.monitor' : 'layouts.panel')
 
 @section('title', 'Editar sesión')
 
@@ -36,9 +36,15 @@
         {{-- BOTONES --}}
         <button class="btn btn-primary">Actualizar</button>
 
-        <a href="{{ route('monitor-sessions.index') }}" class="btn btn-secondary">
-            Cancelar
-        </a>
+        @if(auth()->user()?->roles?->name === 'Monitor')
+            <a href="{{ route('monitor.dashboard') }}" class="btn btn-secondary">
+                Cancelar
+            </a>
+        @else
+            <a href="{{ route('monitor-sessions.index') }}" class="btn btn-secondary">
+                Cancelar
+            </a>
+        @endif
     </form>
 
 @endsection

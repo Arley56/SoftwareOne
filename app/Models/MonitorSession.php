@@ -9,6 +9,7 @@ use App\Models\Schedule;
 use App\Models\Feedback;
 use App\Models\Attendance;
 use App\Models\SessionEnrollment;
+use App\Models\SessionMaterial;
 
 class MonitorSession extends Model
 {
@@ -31,6 +32,11 @@ class MonitorSession extends Model
     public function sessionEnrollments()
     {
         return $this->hasMany(SessionEnrollment::class);
+    }
+
+    public function sessionMaterials()
+    {
+        return $this->hasMany(SessionMaterial::class);
     }
 
 }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\MonitorController;
+use App\Http\Controllers\MonitorDashboardController;
 use App\Http\Controllers\MonitorSessionController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PostController;
@@ -21,6 +22,7 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/monitor/dashboard', [MonitorDashboardController::class, 'index'])->name('monitor.dashboard');
 
     // Perfil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -31,6 +33,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('attendances', AttendanceController::class);
     Route::resource('monitors', MonitorController::class);
     Route::resource('monitor-sessions', MonitorSessionController::class);
+    Route::post('monitor-sessions/{monitorSession}/materials', [MonitorSessionController::class, 'storeMaterial'])
+        ->name('monitor-sessions.materials.store');
+    Route::delete('monitor-sessions/{monitorSession}/materials/{sessionMaterial}', [MonitorSessionController::class, 'destroyMaterial'])
+        ->name('monitor-sessions.materials.destroy');
     Route::resource('comments', CommentController::class);
     Route::resource('posts', PostController::class);
     Route::resource('roles', RoleController::class);

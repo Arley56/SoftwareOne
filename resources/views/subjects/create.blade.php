@@ -52,7 +52,6 @@
             <label class="form-label">Descripción</label>
             <textarea name="description" class="form-control" placeholder="Ejemplo: Materia de matemáticas básica"></textarea>
         </div>
-        </div>
 
         <button type="submit" class="btn btn-success">
             Crear Materia

@@ -16,6 +16,11 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+
+        if ($user?->roles?->name === 'Monitor') {
+            return redirect()->route('monitor.dashboard');
+        }
+
         $sessionsQuery = MonitorSession::with(['schedule.monitor.user', 'schedule.monitor.subject'])
             ->orderByDesc('fecha')
             ->orderByDesc('id');
