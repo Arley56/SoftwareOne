@@ -6,6 +6,7 @@ use App\Models\Monitor;
 use App\Models\Schedule;
 use App\Models\MonitorSession;
 use App\Models\Attendance;
+use App\Models\SessionEnrollment;
 
 
 use Illuminate\Http\Request;
@@ -43,10 +44,30 @@ class DashboardController extends Controller
 
         $sessions = $sessionsQuery->paginate(8)->withQueryString();
 
+        $enrolledSessionIds = [];
+        $enrollmentMap = [];
+        if ($user?->roles?->name !== 'Administrador') {
+            $sessionPageIds = $sessions->pluck('id')->all();
+
+            if (!empty($sessionPageIds)) {
+                $activeEnrollments = SessionEnrollment::where('user_id', $user->id)
+                    ->whereIn('monitor_session_id', $sessionPageIds)
+                    ->where('status', 'activa')
+                    ->get(['id', 'monitor_session_id']);
+
+                $enrolledSessionIds = $activeEnrollments->pluck('monitor_session_id')->all();
+                $enrollmentMap = $activeEnrollments
+                    ->mapWithKeys(fn ($item) => [$item->monitor_session_id => $item->id])
+                    ->all();
+            }
+        }
+
         if ($request->ajax()) {
             return response()->json([
                 'html' => view('dashboard._sessions', [
                     'sessions' => $sessions,
+                    'enrolledSessionIds' => $enrolledSessionIds,
+                    'enrollmentMap' => $enrollmentMap,
                 ])->render(),
                 'url' => $request->fullUrl(),
             ]);
@@ -60,6 +81,8 @@ class DashboardController extends Controller
             'totalAttendances' => Attendance::count(),
             'recentAttendances' => Attendance::with('user')->latest()->take(5)->get(),
             'sessions' => $sessions,
+            'enrolledSessionIds' => $enrolledSessionIds,
+            'enrollmentMap' => $enrollmentMap,
         ];
 
         if ($user?->roles?->name === 'Administrador') {

@@ -9,6 +9,7 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\ScheduleController;
+use App\Http\Controllers\SessionEnrollmentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -36,6 +37,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::resource('schedules', ScheduleController::class);
     Route::resource('subjects', SubjectController::class);
     Route::resource('users', UserController::class);
+
+    Route::post('monitor-sessions/{monitorSession}/enrollments', [SessionEnrollmentController::class, 'store'])
+        ->name('monitor-sessions.enrollments.store');
+    Route::get('session-enrollments', [SessionEnrollmentController::class, 'index'])
+        ->name('session-enrollments.index');
+    Route::get('session-enrollments/{sessionEnrollment}', [SessionEnrollmentController::class, 'show'])
+        ->name('session-enrollments.show');
+    Route::delete('session-enrollments/{sessionEnrollment}', [SessionEnrollmentController::class, 'destroy'])
+        ->name('session-enrollments.destroy');
 });
 
 require __DIR__.'/auth.php';

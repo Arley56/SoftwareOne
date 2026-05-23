@@ -1,3 +1,8 @@
+@php
+    $enrolledSessionIds = $enrolledSessionIds ?? [];
+    $enrollmentMap = $enrollmentMap ?? [];
+@endphp
+
 <div class="card border mb-4" id="dashboard-sessions-card">
     <div class="card-header border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div>
@@ -50,7 +55,50 @@
                             @if (auth()->user()?->roles?->name === 'Administrador')
                                 <a href="{{ route('monitor-sessions.show', $session->id) }}" class="btn btn-info btn-sm">Ver</a>
                             @else
-                                <button type="button" class="btn btn-primary btn-sm">Inscribirme</button>
+                                @if (in_array($session->id, $enrolledSessionIds))
+                                    <div class="d-flex gap-2 flex-wrap">
+                                        <span class="badge text-bg-success">Inscrito</span>
+                                        @if (isset($enrollmentMap[$session->id]))
+                                            <a href="{{ route('session-enrollments.show', $enrollmentMap[$session->id]) }}" class="btn btn-outline-info btn-sm">Ver inscripción</a>
+                                        @endif
+                                    </div>
+                                @else
+                                    <button
+                                        type="button"
+                                        class="btn btn-primary btn-sm"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#enrollModal{{ $session->id }}"
+                                    >
+                                        Inscribirme
+                                    </button>
+
+                                    <div class="modal fade" id="enrollModal{{ $session->id }}" tabindex="-1" aria-labelledby="enrollModalLabel{{ $session->id }}" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content bg-dark text-light border-secondary">
+                                                <div class="modal-header border-secondary">
+                                                    <h5 class="modal-title" id="enrollModalLabel{{ $session->id }}">Confirmar inscripción</h5>
+                                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <p class="mb-3">¿Quieres inscribirte en esta monitoría?</p>
+                                                    <ul class="list-group list-group-flush">
+                                                        <li class="list-group-item bg-dark text-light border-secondary"><strong>Monitoría:</strong> {{ $session->schedule->monitor->subject->name ?? 'Sin asignatura' }}</li>
+                                                        <li class="list-group-item bg-dark text-light border-secondary"><strong>Monitor:</strong> {{ $session->schedule->monitor->user->name ?? 'Sin monitor' }}</li>
+                                                        <li class="list-group-item bg-dark text-light border-secondary"><strong>Horario:</strong> {{ $session->schedule->hora_inicio ?? '' }} - {{ $session->schedule->hora_fin ?? '' }}</li>
+                                                        <li class="list-group-item bg-dark text-light border-secondary"><strong>Fecha:</strong> {{ $session->fecha }}</li>
+                                                    </ul>
+                                                </div>
+                                                <div class="modal-footer border-secondary">
+                                                    <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancelar</button>
+                                                    <form method="POST" action="{{ route('monitor-sessions.enrollments.store', $session->id) }}">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-primary">Aceptar</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
                             @endif
                         </td>
                     </tr>
