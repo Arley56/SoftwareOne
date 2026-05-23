@@ -1,12 +1,12 @@
-<div class="card bg-dark text-white border-secondary mb-4 shadow-sm" id="dashboard-sessions-card">
-    <div class="card-header border-secondary d-flex justify-content-between align-items-center flex-wrap gap-2">
+<div class="card border mb-4" id="dashboard-sessions-card">
+    <div class="card-header border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div>
-            <h4 class="mb-0">Sesiones existentes</h4>
-            <small class="text-secondary">Filtra las monitorias por asignatura, monitor o fecha.</small>
+            <h4 class="mb-0">Monitorías disponibles</h4>
+            <small class="text-secondary">Filtra las monitorías por asignatura, monitor o fecha.</small>
         </div>
-        <span class="badge text-bg-secondary">{{ $sessions->total() }} resultados</span>
+        <span class="badge text-bg-warning text-dark">{{ $sessions->total() }} resultados</span>
     </div>
-    <div class="card-body border-bottom border-secondary">
+    <div class="card-body border-bottom">
         <form method="GET" action="{{ route('dashboard') }}" class="row g-3 align-items-end" id="dashboard-filters">
             <div class="col-md-4">
                 <label for="subject" class="form-label">Monitoria</label>
@@ -22,7 +22,7 @@
             </div>
             <div class="col-12 d-flex gap-2 flex-wrap">
                 <button type="submit" class="btn btn-success">Filtrar</button>
-                <a href="{{ route('dashboard') }}" class="btn btn-outline-light" id="dashboard-reset">Limpiar</a>
+                <a href="{{ route('dashboard') }}" class="btn btn-outline-secondary" id="dashboard-reset">Limpiar</a>
             </div>
         </form>
     </div>
@@ -47,7 +47,11 @@
                         <td>{{ $session->schedule->hora_inicio ?? '' }} - {{ $session->schedule->hora_fin ?? '' }}</td>
                         <td>{{ $session->fecha }}</td>
                         <td>
-                            <a href="{{ route('monitor-sessions.show', $session->id) }}" class="btn btn-info btn-sm">Ver</a>
+                            @if (auth()->user()?->roles?->name === 'Administrador')
+                                <a href="{{ route('monitor-sessions.show', $session->id) }}" class="btn btn-info btn-sm">Ver</a>
+                            @else
+                                <button type="button" class="btn btn-primary btn-sm">Inscribirme</button>
+                            @endif
                         </td>
                     </tr>
                 @empty
@@ -60,7 +64,7 @@
             </tbody>
         </table>
     </div>
-    <div class="card-footer border-secondary bg-transparent">
+    <div class="card-footer border-top">
         {{ $sessions->links('pagination::bootstrap-5') }}
     </div>
 </div>

@@ -3,7 +3,7 @@
 @section('title', 'Dashboard de Administrador')
 
 @section('content')
-    <div class="p-4 p-lg-5 rounded-4 mb-4 bg-body-tertiary border border-secondary-subtle shadow-sm text-dark">
+    <div class="p-4 p-lg-5 rounded-4 mb-4 bg-body-tertiary border border-secondary-subtle shadow-sm text-light">
         <div class="row align-items-center g-4">
             <div class="col-lg-8">
                 <span class="badge text-bg-success mb-3">Panel de inicio</span>

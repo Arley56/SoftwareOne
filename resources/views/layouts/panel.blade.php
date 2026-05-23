@@ -1,20 +1,21 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-bs-theme="dark">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Sistema de Gestión de Monitorias')</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    @include('layouts._dark-theme-styles')
     @stack('styles')
 </head>
 
-<body class="bg-dark text-light">
+<body class="app-theme">
 
     <div class="d-flex flex-column min-vh-100">
 
     <!-- HEADER -->
-    <header class="bg-success text-white shadow">
+    <header class="app-topbar text-white shadow">
         <div class="container py-4">
             <h1 class="fw-bold mb-1">
                 Sistema de Gestión de Monitorias
@@ -37,7 +38,7 @@
             </button>
 
             <div class="collapse navbar-collapse" id="navbarMonitorias">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-lg-center">
                     <li class="nav-item">
                         <a  href="{{ route('monitors.index') }}" class="nav-link">Monitores</a>
                     </li>
@@ -59,28 +60,28 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('roles.index') }}">Roles</a>
                     </li>
-                    <div class="dropdown">
+                    <li class="nav-item dropdown ms-lg-2">
                         <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             {{ Auth::user()->name }}
                         </button>
                         <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li>
+                            <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Perfil</a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit" class="dropdown-item">Log Out</button>
+                                    <button type="submit" class="dropdown-item">Cerrar Sesión</button>
                                 </form>
                             </li>
                         </ul>
-                    </div>
+                    </li>
                 </ul>
             </div>
         </div>
     </nav>
 
     <!-- CONTENIDO PRINCIPAL -->
-    <main class="container my-5 grow">
+    <main class="container my-5 app-main">
 
         @yield('content')
 
@@ -102,7 +103,8 @@
     </footer>
 
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    @stack('scripts')
     </div>
 
 </body>
