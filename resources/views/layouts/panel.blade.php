@@ -39,27 +39,37 @@
 
             <div class="collapse navbar-collapse" id="navbarMonitorias">
                 <ul class="navbar-nav ms-auto align-items-lg-center">
-                    <li class="nav-item">
-                        <a  href="{{ route('monitors.index') }}" class="nav-link">Monitores</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('subjects.index') }}">Materias</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('users.index') }}">Usuarios</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('schedules.index') }}">Horarios</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('attendances.index') }}">Asistencias</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('monitor-sessions.index') }}">Sesión de Monitorias</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('roles.index') }}">Roles</a>
-                    </li>
+
+                    {{-- Solo ADMIN --}}
+                    @if(Auth::user()->role_id == 1)
+                        <li class="nav-item">
+                            <a href="{{ route('monitors.index') }}" class="nav-link">Monitores</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('subjects.index') }}">Materias</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('users.index') }}">Usuarios</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('roles.index') }}">Roles</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('attendances.index') }}">Asistencias</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('monitor-sessions.index') }}">Sesión de Monitorias</a>
+                        </li>
+                    @endif
+
+                    {{-- ADMIN y MONITOR --}}
+                    @if(in_array(Auth::user()->role_id, [1, 2]))
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('schedules.index') }}">Horarios</a>
+                        </li>
+                    @endif
+
+                    {{-- Siempre visible --}}
                     <li class="nav-item dropdown ms-lg-2">
                         <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                             {{ Auth::user()->name }}
@@ -75,9 +85,10 @@
                             </li>
                         </ul>
                     </li>
+
                 </ul>
             </div>
-        </div>
+            </div>
     </nav>
 
     <!-- CONTENIDO PRINCIPAL -->

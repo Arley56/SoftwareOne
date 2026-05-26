@@ -35,6 +35,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="#month-board">Citas del mes</a>
                         </li>
+                        <li class="nav-item">
+                        <a class="nav-link" href="{{ route('schedules.index') }}">Horarios</a>
+                        </li>
                         <li class="nav-item dropdown ms-lg-2">
                             <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 {{ Auth::user()->name }}

@@ -21,37 +21,45 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
+    // Rutas accesibles para TODOS los roles
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/monitor/dashboard', [MonitorDashboardController::class, 'index'])->name('monitor.dashboard');
-
-    // Perfil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // CRUDs
-    Route::resource('attendances', AttendanceController::class);
-    Route::resource('monitors', MonitorController::class);
-    Route::resource('monitor-sessions', MonitorSessionController::class);
-    Route::post('monitor-sessions/{monitorSession}/materials', [MonitorSessionController::class, 'storeMaterial'])
-        ->name('monitor-sessions.materials.store');
-    Route::delete('monitor-sessions/{monitorSession}/materials/{sessionMaterial}', [MonitorSessionController::class, 'destroyMaterial'])
-        ->name('monitor-sessions.materials.destroy');
-    Route::resource('comments', CommentController::class);
-    Route::resource('posts', PostController::class);
-    Route::resource('roles', RoleController::class);
-    Route::resource('schedules', ScheduleController::class);
-    Route::resource('subjects', SubjectController::class);
-    Route::resource('users', UserController::class);
+    // Rutas SOLO para MONITOR (role_id == 2)
+    Route::middleware('role:2')->group(function () {
+        Route::get('/monitor/dashboard', [MonitorDashboardController::class, 'index'])->name('monitor.dashboard');
+    });
 
-    Route::post('monitor-sessions/{monitorSession}/enrollments', [SessionEnrollmentController::class, 'store'])
-        ->name('monitor-sessions.enrollments.store');
-    Route::get('session-enrollments', [SessionEnrollmentController::class, 'index'])
-        ->name('session-enrollments.index');
-    Route::get('session-enrollments/{sessionEnrollment}', [SessionEnrollmentController::class, 'show'])
-        ->name('session-enrollments.show');
-    Route::delete('session-enrollments/{sessionEnrollment}', [SessionEnrollmentController::class, 'destroy'])
-        ->name('session-enrollments.destroy');
+    //  Rutas SOLO para ADMIN (role_id == 1)
+    Route::middleware('role:1')->group(function () {
+        Route::resource('monitors', MonitorController::class);
+        Route::resource('roles', RoleController::class);
+        Route::resource('users', UserController::class);
+        Route::resource('subjects', SubjectController::class);
+    });
+
+    // Rutas para ADMIN y MONITOR (role_id == 1 o 2)
+    Route::middleware('role:1,2')->group(function () {
+        Route::resource('schedules', ScheduleController::class);
+        Route::resource('attendances', AttendanceController::class);
+        Route::resource('monitor-sessions', MonitorSessionController::class);
+        Route::post('monitor-sessions/{monitorSession}/materials', [MonitorSessionController::class, 'storeMaterial'])
+            ->name('monitor-sessions.materials.store');
+        Route::delete('monitor-sessions/{monitorSession}/materials/{sessionMaterial}', [MonitorSessionController::class, 'destroyMaterial'])
+            ->name('monitor-sessions.materials.destroy');
+        Route::resource('comments', CommentController::class);
+        Route::resource('posts', PostController::class);
+        Route::post('monitor-sessions/{monitorSession}/enrollments', [SessionEnrollmentController::class, 'store'])
+            ->name('monitor-sessions.enrollments.store');
+        Route::get('session-enrollments', [SessionEnrollmentController::class, 'index'])
+            ->name('session-enrollments.index');
+        Route::get('session-enrollments/{sessionEnrollment}', [SessionEnrollmentController::class, 'show'])
+            ->name('session-enrollments.show');
+        Route::delete('session-enrollments/{sessionEnrollment}', [SessionEnrollmentController::class, 'destroy'])
+            ->name('session-enrollments.destroy');
+    });
 });
 
 require __DIR__.'/auth.php';

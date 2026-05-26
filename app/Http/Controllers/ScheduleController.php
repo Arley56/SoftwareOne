@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use App\Models\Schedule;
 use App\Models\Monitor;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 class ScheduleController extends Controller
@@ -10,13 +11,23 @@ class ScheduleController extends Controller
 
     public function index()
     {
-        $schedules = Schedule::with('monitor.user')->paginate(10);
+        if (Auth::user()->role_id == 1) {
+            $schedules = Schedule::with('monitor.user')->paginate(10);
+        } else {
+            $monitorActual = Monitor::where('user_id', Auth::id())->first();
+            $schedules = Schedule::with('monitor.user')
+                ->where('monitor_id', $monitorActual->id)
+                ->paginate(10);
+        }
+
         return view('schedules.index', compact('schedules'));
     }
     public function create()
     {
         $monitors = Monitor::with('user')->get();
-        return view('schedules.create', compact('monitors'));
+        $monitorActual = Monitor::where('user_id', Auth::id())->first();
+
+        return view('schedules.create', compact('monitors', 'monitorActual'));
     }
 
     public function store(Request $request)
@@ -48,7 +59,9 @@ class ScheduleController extends Controller
     {
         $schedule = Schedule::findOrFail($id);
         $monitors = Monitor::with('user')->get();
-        return view('schedules.edit', compact('schedule', 'monitors'));
+        $monitorActual = Monitor::where('user_id', Auth::id())->first();
+
+        return view('schedules.edit', compact('schedule', 'monitors', 'monitorActual'));
     }
 
     public function update(Request $request, string $id)

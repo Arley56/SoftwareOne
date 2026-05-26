@@ -9,21 +9,26 @@
             @method('PUT')
 
             {{-- Monitor --}}
-            <div class="mb-3">
-                <label for="monitor_id" class="form-label">Monitor</label>
+            @if(Auth::user()->role_id == 1)
+                <div class="mb-3">
+                    <label for="monitor_id" class="form-label">Monitor</label>
+                    <select name="monitor_id" id="monitor_id" class="form-control" required>
+                        <option value="">Seleccione un monitor</option>
+                        @foreach($monitors as $monitor)
+                            <option value="{{ $monitor->id }}" {{ $schedule->monitor_id == $monitor->id ? 'selected' : '' }}>
+                                {{ $monitor->user->name ?? 'Sin nombre' }} - Sem {{ $monitor->semestre }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
-                <select name="monitor_id" id="monitor_id" class="form-control" required>
-                    <option value="">Seleccione un monitor</option>
-
-                    @foreach($monitors as $monitor)
-                        <option value="{{ $monitor->id }}" {{ $schedule->monitor_id == $monitor->id ? 'selected' : '' }}>
-
-                            {{ $monitor->user->name ?? 'Sin nombre' }} - Sem {{ $monitor->semestre }}
-
-                        </option>
-                    @endforeach
-                </select>
-            </div>
+            @elseif(Auth::user()->role_id == 2)
+                <input type="hidden" name="monitor_id" value="{{ $monitorActual->id }}">
+                <div class="mb-3">
+                    <label class="form-label">Monitor</label>
+                    <input type="text" class="form-control" value="{{ $monitorActual->user->name }}" disabled>
+                </div>
+            @endif
 
                 {{-- Día de la semana --}}
             <div class="mb-3">
