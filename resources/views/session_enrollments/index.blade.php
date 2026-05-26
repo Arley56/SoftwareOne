@@ -23,6 +23,18 @@
                 <small class="text-secondary">Listado de tus inscripciones activas.</small>
             </div>
             <span class="badge text-bg-warning text-dark">{{ $enrollments->total() }} registros</span>
+            <p class="text-secondary mb-0">
+                Historial de monitorías inscritas.
+            </p>
+            </div>
+
+            <a
+                href="{{ route('session-enrollments.export.pdf') }}"
+                target="_blank"
+                class="btn btn-danger rounded-pill px-4"
+            >
+                Exportar PDF
+            </a>
         </div>
 
         <div class="table-responsive">

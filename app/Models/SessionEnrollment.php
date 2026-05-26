@@ -26,4 +26,8 @@ class SessionEnrollment extends Model
     {
         return $this->belongsTo(MonitorSession::class, 'monitor_session_id');
     }
+    public function sessionExercises()
+    {
+        return $this->hasMany(SessionExercise::class);
+    }
 }

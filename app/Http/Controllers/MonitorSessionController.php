@@ -38,7 +38,11 @@ class MonitorSessionController extends Controller
         $session = MonitorSession::with([
             'schedule.monitor.user',
             'sessionEnrollments' => function ($query) {
-                $query->where('status', 'activa')->with('user');
+                $query->where('status', 'activa')
+                    ->with([
+                        'user',
+                        'sessionExercises'
+                    ]);
             },
             'sessionMaterials.uploader',
         ])->findOrFail($id);
@@ -84,6 +88,34 @@ class MonitorSessionController extends Controller
         return redirect()
             ->route('monitor-sessions.show', $monitorSession->id)
             ->with('status', 'Material de apoyo cargado correctamente.');
+    }
+    public function storeStudentMaterial(Request $request, MonitorSession $monitorSession)
+    {
+        $request->validate([
+            'exercise_file' => 'required|file|mimes:pdf,jpg,jpeg,png|max:10240',
+        ]);
+
+        $file = $request->file('exercise_file');
+
+        $originalName = $file->getClientOriginalName();
+
+        $path = $file->storePublicly(
+            "student-materials/{$monitorSession->id}",
+            'public'
+        );
+
+        SessionMaterial::create([
+            'monitor_session_id' => $monitorSession->id,
+            'uploaded_by_user_id' => auth()->id(),
+            'original_name' => $originalName,
+            'file_path' => $path,
+            'mime_type' => $file->getClientMimeType(),
+            'size' => $file->getSize(),
+        ]);
+
+        return redirect()
+            ->back()
+            ->with('success', 'Archivo cargado correctamente.');
     }
 
     public function edit($id)

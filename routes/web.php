@@ -65,6 +65,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('session-enrollments.show');
         Route::delete('session-enrollments/{sessionEnrollment}', [SessionEnrollmentController::class, 'destroy'])
             ->name('session-enrollments.destroy');
+        Route::post(
+            'session-enrollments/{sessionEnrollment}/upload-exercise',[SessionEnrollmentController::class, 'uploadExercise'])
+            ->name('session-enrollments.upload-exercise');
+        Route::post(
+            'session-enrollments/{id}/upload-file',
+            [SessionEnrollmentController::class, 'uploadFile']
+        )->name('session-enrollments.upload-file');
+        Route::get(
+            'session-enrollments/export/pdf',
+            [SessionEnrollmentController::class, 'exportPdf']
+        )->name('session-enrollments.export.pdf');
     });
 });
 
