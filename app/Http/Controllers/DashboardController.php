@@ -14,6 +14,7 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
+        // Redirigir a dashboard específico para monitores
 
         if ($user->role_id === 2) {
             return redirect()->route('monitor.dashboard');
