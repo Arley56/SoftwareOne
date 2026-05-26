@@ -3,6 +3,28 @@
     $enrollmentMap = $enrollmentMap ?? [];
 @endphp
 
+{{-- Mensajes de alerta --}}
+@if(session('warning'))
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        {{ session('warning') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+@endif
+
 <div class="card border mb-4" id="dashboard-sessions-card">
     <div class="card-header border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div>
@@ -52,9 +74,12 @@
                         <td>{{ $session->schedule->hora_inicio ?? '' }} - {{ $session->schedule->hora_fin ?? '' }}</td>
                         <td>{{ $session->fecha }}</td>
                         <td>
-                            @if (auth()->user()?->roles?->name === 'Administrador')
-                                <a href="{{ route('monitor-sessions.show', $session->id) }}" class="btn btn-info btn-sm">Ver</a>
-                            @else
+                                
+                                @if (auth()->user()?->role_id === 1)
+                                    <a href="{{ route('monitor-sessions.show', $session->id) }}" class="btn btn-info btn-sm">Ver</a>
+                                @elseif (auth()->user()?->role_id === 2)
+                                    <a href="{{ route('monitor-sessions.show', $session->id) }}" class="btn btn-info btn-sm">Ver</a>
+                                @else
                                 @if (in_array($session->id, $enrolledSessionIds))
                                     <div class="d-flex gap-2 flex-wrap">
                                         <span class="badge text-bg-success">Inscrito</span>

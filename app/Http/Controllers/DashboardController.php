@@ -7,8 +7,6 @@ use App\Models\Schedule;
 use App\Models\MonitorSession;
 use App\Models\Attendance;
 use App\Models\SessionEnrollment;
-
-
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -17,7 +15,7 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        if ($user?->roles?->name === 'Monitor') {
+        if ($user->role_id === 2) {
             return redirect()->route('monitor.dashboard');
         }
 
@@ -27,7 +25,6 @@ class DashboardController extends Controller
 
         if ($request->filled('subject')) {
             $subject = $request->input('subject');
-
             $sessionsQuery->whereHas('schedule.monitor.subject', function ($query) use ($subject) {
                 $query->where('name', 'like', '%' . $subject . '%');
             });
@@ -35,23 +32,21 @@ class DashboardController extends Controller
 
         if ($request->filled('monitor')) {
             $monitor = $request->input('monitor');
-
             $sessionsQuery->whereHas('schedule.monitor.user', function ($query) use ($monitor) {
                 $query->where('name', 'like', '%' . $monitor . '%');
             });
         }
 
         if ($request->filled('fecha')) {
-            $fecha = $request->input('fecha');
-
-            $sessionsQuery->whereDate('fecha', $fecha);
+            $sessionsQuery->whereDate('fecha', $request->input('fecha'));
         }
 
         $sessions = $sessionsQuery->paginate(8)->withQueryString();
 
         $enrolledSessionIds = [];
         $enrollmentMap = [];
-        if ($user?->roles?->name !== 'Administrador') {
+
+        if ($user->role_id === 3) {
             $sessionPageIds = $sessions->pluck('id')->all();
 
             if (!empty($sessionPageIds)) {
@@ -90,7 +85,7 @@ class DashboardController extends Controller
             'enrollmentMap' => $enrollmentMap,
         ];
 
-        if ($user?->roles?->name === 'Administrador') {
+        if ($user->role_id === 1) {
             return view('dashboard1', $dashboardData);
         }
 

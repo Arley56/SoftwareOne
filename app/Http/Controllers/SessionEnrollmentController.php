@@ -12,7 +12,7 @@ class SessionEnrollmentController extends Controller
     {
         $user = $request->user();
 
-        if ($user?->roles?->name === 'Administrador') {
+        if (in_array($user->role_id, [1, 2])) {
             return redirect()->route('dashboard')->with('warning', 'Esta sección es para estudiantes.');
         }
 
@@ -32,8 +32,8 @@ class SessionEnrollmentController extends Controller
     {
         $user = $request->user();
 
-        if ($user?->roles?->name === 'Administrador') {
-            return back()->with('error', 'Un administrador no puede inscribirse en monitorías.');
+        if (in_array($user->role_id, [1, 2])) {
+            return back()->with('error', 'Solo los estudiantes pueden inscribirse en monitorías.');
         }
 
         $enrollment = SessionEnrollment::where('user_id', $user->id)
@@ -67,7 +67,7 @@ class SessionEnrollmentController extends Controller
     public function show(Request $request, SessionEnrollment $sessionEnrollment)
     {
         $user = $request->user();
-        $isAdmin = $user?->roles?->name === 'Administrador';
+        $isAdmin = $user->role_id === 1;
 
         if (! $isAdmin && (int) $sessionEnrollment->user_id !== (int) $user->id) {
             abort(403);

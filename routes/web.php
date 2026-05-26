@@ -27,12 +27,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Ruta de inscripción accesible para TODOS los roles autenticados
+    Route::post('monitor-sessions/{monitorSession}/enrollments', [SessionEnrollmentController::class, 'store'])
+        ->name('monitor-sessions.enrollments.store');
+
     // Rutas SOLO para MONITOR (role_id == 2)
     Route::middleware('role:2')->group(function () {
         Route::get('/monitor/dashboard', [MonitorDashboardController::class, 'index'])->name('monitor.dashboard');
     });
 
-    //  Rutas SOLO para ADMIN (role_id == 1)
+    // Rutas SOLO para ADMIN (role_id == 1)
     Route::middleware('role:1')->group(function () {
         Route::resource('monitors', MonitorController::class);
         Route::resource('roles', RoleController::class);
@@ -51,8 +55,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('monitor-sessions.materials.destroy');
         Route::resource('comments', CommentController::class);
         Route::resource('posts', PostController::class);
-        Route::post('monitor-sessions/{monitorSession}/enrollments', [SessionEnrollmentController::class, 'store'])
-            ->name('monitor-sessions.enrollments.store');
+    });
+
+    // Rutas SOLO para ESTUDIANTES (role_id == 3)
+    Route::middleware('role:3')->group(function () {
         Route::get('session-enrollments', [SessionEnrollmentController::class, 'index'])
             ->name('session-enrollments.index');
         Route::get('session-enrollments/{sessionEnrollment}', [SessionEnrollmentController::class, 'show'])
