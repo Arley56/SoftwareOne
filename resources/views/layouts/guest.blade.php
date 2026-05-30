@@ -13,8 +13,11 @@
     </head>
     <body class="app-theme">
         <div class="min-vh-100 d-flex align-items-center justify-content-center py-5">
+        <meta name="csrf-token" content="{{ csrf_token() }}">
             <div class="card shadow-sm border w-100" style="max-width: 560px;">
                 <div class="card-body p-4 p-md-5">
+                    <x-flash-alerts />
+
                     <div class="text-center mb-4">
                         <a href="/" class="text-decoration-none text-light fw-bold fs-4">
                             Sistema de Monitorias
@@ -27,6 +30,7 @@
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        @include('layouts._flash-alerts-script')
         @stack('scripts')
     </body>
 </html>

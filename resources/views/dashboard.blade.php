@@ -1,17 +1,4 @@
 <x-app-layout>
-    @if (session('success'))
-        <div class="alert alert-success mb-4">{{ session('success') }}</div>
-    @endif
-    @if (session('warning'))
-        <div class="alert alert-warning mb-4">{{ session('warning') }}</div>
-    @endif
-    @if (session('error'))
-        <div class="alert alert-danger mb-4">{{ session('error') }}</div>
-    @endif
-    @if (session('info'))
-        <div class="alert alert-info mb-4">{{ session('info') }}</div>
-    @endif
-
     <div class="row justify-content-center">
         <div class="col-12 col-xl-10">
             <div class="card shadow-sm border-0 mb-4">
@@ -28,7 +15,9 @@
                 </div>
             </div>
 
-            @include('dashboard._sessions')
+            <div id="dashboard-sessions-wrapper">
+                @include('dashboard._sessions')
+            </div>
         </div>
     </div>
 </x-app-layout>

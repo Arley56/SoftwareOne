@@ -35,6 +35,8 @@ class MonitorSessionController extends Controller
 
     public function show($id)
     {
+        $user = request()->user();
+
         $session = MonitorSession::with([
             'schedule.monitor.user',
             'sessionEnrollments' => function ($query) {
@@ -46,7 +48,22 @@ class MonitorSessionController extends Controller
             },
             'sessionMaterials.uploader',
         ])->findOrFail($id);
-        return view('monitor_sessions.show', compact('session'));
+
+        $isAdmin = (int) $user->role_id === 1;
+        $isOwnerMonitor = (int) $user->role_id === 2
+            && (int) ($session->schedule->monitor->user_id ?? 0) === (int) $user->id;
+
+        $canViewComments = $isAdmin || $isOwnerMonitor;
+        $canComment = $isOwnerMonitor;
+
+        if ($canViewComments) {
+            $session->load([
+                'sessionComments.user.roles',
+                'sessionComments.replies.user.roles',
+            ]);
+        }
+
+        return view('monitor_sessions.show', compact('session', 'canViewComments', 'canComment'));
     }
 
     public function destroyMaterial(Request $request, MonitorSession $monitorSession, SessionMaterial $sessionMaterial)

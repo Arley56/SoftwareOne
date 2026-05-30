@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Feedback;
 use App\Models\MonitorSession;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class FeedbackSeeder extends Seeder
@@ -14,7 +13,6 @@ class FeedbackSeeder extends Seeder
      */
     public function run(): void
     {
-        $feedbacks = [];
         $comentarios = [
             'Excelente monitoría, muy clara.',
             'El monitor domina mucho el tema.',
@@ -23,18 +21,31 @@ class FeedbackSeeder extends Seeder
             'Resolvió todas mis dudas con paciencia.'
         ];
 
-        for ($i = 1; $i <= 30; $i++) {
-            $feedbacks[] = [
-                'monitor_session_id' => $i,           // Una calificación por cada sesión
-                'user_id'            => rand(6, 10),  // Calificado por un estudiante aleatorio
-                'calificacion'       => rand(4, 5),   // Calificaciones positivas para el ejemplo
-                'comentario'         => $comentarios[array_rand($comentarios)],
-                'created_at'         => now(),
-            ];
+        $sessions = MonitorSession::with(['sessionEnrollments' => function ($query) {
+            $query->where('status', 'activa')->orderBy('user_id');
+        }])->orderBy('id')->get();
+
+        if ($sessions->isEmpty()) {
+            $this->command->error('No hay monitorías para generar feedback.');
+            return;
         }
-        foreach ($feedbacks as $item) {
-            Feedback::create($item);
+
+        foreach ($sessions as $sessionIndex => $session) {
+            $enrollment = $session->sessionEnrollments->first();
+
+            if (! $enrollment) {
+                continue;
+            }
+
+            Feedback::create([
+                'monitor_session_id' => $session->id,
+                'user_id' => $enrollment->user_id,
+                'calificacion' => rand(4, 5),
+                'comentario' => $comentarios[$sessionIndex % count($comentarios)],
+                'created_at' => now(),
+            ]);
         }
-  
+
+        $this->command->info('Se generaron feedbacks de prueba usando inscripciones activas.');
     }
 }

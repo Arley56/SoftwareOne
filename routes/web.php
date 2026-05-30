@@ -6,6 +6,7 @@ use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\MonitorDashboardController;
 use App\Http\Controllers\MonitorSessionController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\SessionCommentController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RoleController;
@@ -30,6 +31,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Ruta de inscripción accesible para TODOS los roles autenticados
     Route::post('monitor-sessions/{monitorSession}/enrollments', [SessionEnrollmentController::class, 'store'])
         ->name('monitor-sessions.enrollments.store');
+
+    // Comentarios de sesión compartidos entre estudiantes inscritos y monitor asociado
+    Route::post('monitor-sessions/{monitorSession}/comments', [SessionCommentController::class, 'store'])
+        ->name('monitor-sessions.comments.store');
 
     // Rutas SOLO para MONITOR (role_id == 2)
     Route::middleware('role:2')->group(function () {

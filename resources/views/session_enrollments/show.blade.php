@@ -15,12 +15,6 @@
         </div>
     </x-slot>
 
-    @if (session('success'))
-        <div class="alert alert-success mb-4">
-            {{ session('success') }}
-        </div>
-    @endif
-
     <div class="card border-0 shadow-sm bg-dark text-light mb-4">
 
         <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2 border-secondary">
@@ -464,6 +458,14 @@
 
     @endif
 
+    @if($canViewComments)
+        @include('session_comments._thread', [
+            'monitorSession' => $sessionEnrollment->monitorSession,
+            'comments' => $sessionEnrollment->monitorSession->sessionComments,
+            'canComment' => $canComment,
+        ])
+    @endif
+
     {{-- MODAL --}}
     <div
         class="modal fade"
@@ -590,5 +592,7 @@
         </script>
 
     @endpush
+
+    @include('session_comments._script')
 
 </x-app-layout>

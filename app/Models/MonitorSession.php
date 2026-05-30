@@ -10,6 +10,7 @@ use App\Models\Feedback;
 use App\Models\Attendance;
 use App\Models\SessionEnrollment;
 use App\Models\SessionMaterial;
+use App\Models\SessionComment;
 
 class MonitorSession extends Model
 {
@@ -37,6 +38,13 @@ class MonitorSession extends Model
     public function sessionMaterials()
     {
         return $this->hasMany(SessionMaterial::class);
+    }
+
+    public function sessionComments()
+    {
+        return $this->hasMany(SessionComment::class)
+            ->whereNull('parent_id')
+            ->latest();
     }
 
 }

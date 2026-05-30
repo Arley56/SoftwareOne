@@ -4,8 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\MonitorSession;
 use App\Models\Schedule;
-use App\Models\User;
-use App\Models\Monitor;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Seeder;
 
 class MonitorSessionSeeder extends Seeder
@@ -15,15 +14,26 @@ class MonitorSessionSeeder extends Seeder
      */
     public function run(): void
     {
-        $sessions = [];
-        for ($i = 1; $i <= 30; $i++) {
-            $sessions[] = [
-                'schedule_id' => $i,
-                'fecha' => '2026-04-' . str_pad(($i % 30) + 1, 2, '0', STR_PAD_LEFT)
-            ];
+        $schedules = Schedule::orderBy('id')->get();
+
+        if ($schedules->isEmpty()) {
+            $this->command->error('No hay horarios disponibles. Corre primero ScheduleSeeder.');
+            return;
         }
-        foreach ($sessions as $item) {
-            MonitorSession::create($item);
+
+        $dateBuckets = [
+            Carbon::today()->toDateString(),
+            Carbon::tomorrow()->toDateString(),
+            Carbon::today()->addWeek()->toDateString(),
+        ];
+
+        foreach ($schedules as $index => $schedule) {
+            MonitorSession::create([
+                'schedule_id' => $schedule->id,
+                'fecha' => $dateBuckets[$index % count($dateBuckets)],
+            ]);
         }
+
+        $this->command->info('Se han creado monitorías de prueba para hoy, mañana y la próxima semana.');
     }
 }

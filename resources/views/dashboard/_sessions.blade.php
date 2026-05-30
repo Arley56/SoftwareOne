@@ -3,27 +3,7 @@
     $enrollmentMap = $enrollmentMap ?? [];
 @endphp
 
-{{-- Mensajes de alerta --}}
-@if(session('warning'))
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
-        {{ session('warning') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
-
-@if(session('success'))
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ session('success') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
-
-@if(session('error'))
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        {{ session('error') }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-@endif
+<div id="dashboard-feedback"></div>
 
 <div class="card border mb-4" id="dashboard-sessions-card">
     <div class="card-header border-bottom d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -73,7 +53,7 @@
                         <td>{{ $session->schedule->monitor->user->name ?? 'Sin monitor' }}</td>
                         <td>{{ $session->schedule->hora_inicio ?? '' }} - {{ $session->schedule->hora_fin ?? '' }}</td>
                         <td>{{ $session->fecha }}</td>
-                        <td>
+                        <td id="session-action-{{ $session->id }}">
                                 
                                 @if (auth()->user()?->role_id === 1)
                                     <a href="{{ route('monitor-sessions.show', $session->id) }}" class="btn btn-info btn-sm">Ver</a>
@@ -115,7 +95,7 @@
                                                 </div>
                                                 <div class="modal-footer border-secondary">
                                                     <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Cancelar</button>
-                                                    <form method="POST" action="{{ route('monitor-sessions.enrollments.store', $session->id) }}">
+                                                    <form method="POST" action="{{ route('monitor-sessions.enrollments.store', $session->id) }}" class="js-enroll-form" data-session-id="{{ $session->id }}">
                                                         @csrf
                                                         <button type="submit" class="btn btn-primary">Aceptar</button>
                                                     </form>
@@ -141,3 +121,132 @@
         {{ $sessions->links('pagination::bootstrap-5') }}
     </div>
 </div>
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            window.initDashboardSessions = function (root) {
+                const scope = root || document;
+                const dashboardFeedback = document.getElementById('dashboard-feedback');
+
+                function showDashboardAlert(type, message) {
+                    if (!dashboardFeedback) {
+                        return;
+                    }
+
+                    dashboardFeedback.innerHTML = `
+                        <div class="alert alert-${type} alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
+                            ${message}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    `;
+                }
+
+                const filterForm = scope.querySelector('#dashboard-filters');
+                if (filterForm && filterForm.dataset.ajaxBound !== '1') {
+                    filterForm.dataset.ajaxBound = '1';
+
+                    filterForm.addEventListener('submit', async function (event) {
+                        event.preventDefault();
+
+                        const wrapper = document.getElementById('dashboard-sessions-wrapper');
+                        const previousScrollY = window.scrollY || window.pageYOffset;
+                        const formData = new FormData(filterForm);
+                        const queryString = new URLSearchParams(formData).toString();
+                        const targetUrl = queryString ? `${filterForm.action}?${queryString}` : filterForm.action;
+
+                        try {
+                            const response = await fetch(targetUrl, {
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'Accept': 'application/json',
+                                },
+                            });
+
+                            const payload = await response.json();
+
+                            if (!response.ok) {
+                                throw new Error(payload?.message || 'No fue posible filtrar las monitorías.');
+                            }
+
+                            if (wrapper && payload.html) {
+                                wrapper.innerHTML = payload.html;
+                                window.initDashboardSessions(wrapper);
+                            }
+
+                            if (payload.url) {
+                                window.history.replaceState({}, '', payload.url);
+                            }
+
+                            window.scrollTo({ top: previousScrollY, behavior: 'auto' });
+                        } catch (error) {
+                            showDashboardAlert('warning', error.message || 'No fue posible filtrar las monitorías.');
+                        }
+                    });
+                }
+
+                scope.querySelectorAll('.js-enroll-form').forEach(function (form) {
+                    if (form.dataset.enrollBound === '1') {
+                        return;
+                    }
+
+                    form.dataset.enrollBound = '1';
+
+                    form.addEventListener('submit', async function (event) {
+                        event.preventDefault();
+
+                        const submitButton = form.querySelector('button[type="submit"]');
+                        const originalText = submitButton ? submitButton.textContent : '';
+                        const sessionId = form.dataset.sessionId;
+                        const actionCell = document.getElementById(`session-action-${sessionId}`);
+                        const modalElement = form.closest('.modal');
+                        const modalInstance = modalElement ? bootstrap.Modal.getInstance(modalElement) : null;
+
+                        if (submitButton) {
+                            submitButton.disabled = true;
+                            submitButton.textContent = 'Procesando...';
+                        }
+
+                        try {
+                            const response = await fetch(form.action, {
+                                method: 'POST',
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                                    'Accept': 'application/json',
+                                },
+                                body: new FormData(form),
+                            });
+
+                            const payload = await response.json();
+
+                            if (!response.ok || !payload.ok) {
+                                showDashboardAlert('warning', payload.message || 'No fue posible completar la inscripción.');
+                                return;
+                            }
+
+                            if (actionCell && payload.action_html) {
+                                actionCell.innerHTML = payload.action_html;
+                            }
+
+                            showDashboardAlert('success', payload.message || 'Inscripción completada.');
+
+                            if (modalInstance) {
+                                modalInstance.hide();
+                            }
+                        } catch (error) {
+                            showDashboardAlert('danger', 'Ocurrió un error al inscribirte. Intenta nuevamente.');
+                        } finally {
+                            if (submitButton) {
+                                submitButton.disabled = false;
+                                submitButton.textContent = originalText || 'Aceptar';
+                            }
+                        }
+                    });
+                });
+            };
+
+            window.initDashboardSessions(document);
+        });
+    </script>
+@endpush

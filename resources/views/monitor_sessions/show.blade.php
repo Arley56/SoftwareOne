@@ -26,12 +26,6 @@
             @endif
         </div>
 
-        @if(session('status'))
-            <div class="alert alert-success border-0 shadow-sm">
-                {{ session('status') }}
-            </div>
-        @endif
-
         {{-- DETALLE SESIÓN --}}
         <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-dark mb-4">
 
@@ -277,13 +271,18 @@
 
                                     <div class="d-inline-flex gap-2 flex-wrap justify-content-end">
 
-                                        <a
-                                            href="{{ asset('storage/' . $material->file_path) }}"
-                                            target="_blank"
+                                        <button
+                                            type="button"
                                             class="btn btn-outline-info btn-sm rounded-pill px-3"
+                                            data-material-preview
+                                            data-name="{{ $material->original_name }}"
+                                            data-url="{{ asset('storage/' . $material->file_path) }}"
+                                            data-mime="{{ $material->mime_type ?? '' }}"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#materialPreviewModal"
                                         >
-                                            Ver
-                                        </a>
+                                            Vista previa
+                                        </button>
 
                                         @if(auth()->user()?->roles?->name === 'Monitor')
 
@@ -495,13 +494,18 @@
 
                                 <td class="text-end pe-4">
 
-                                    <a
-                                        href="{{ asset('storage/' . $enrollment->student_file) }}"
-                                        target="_blank"
+                                    <button
+                                        type="button"
                                         class="btn btn-outline-info btn-sm rounded-pill px-3"
+                                        data-material-preview
+                                        data-name="{{ basename($enrollment->student_file) }}"
+                                        data-url="{{ asset('storage/' . $enrollment->student_file) }}"
+                                        data-mime="{{ $enrollment->student_file_mime ?? '' }}"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#materialPreviewModal"
                                     >
-                                        Ver archivo
-                                    </a>
+                                        Vista previa
+                                    </button>
 
                                 </td>
 
@@ -530,5 +534,88 @@
 
         </div>
 
+        @if($canViewComments)
+            <div class="mt-4">
+                @include('session_comments._thread', [
+                    'monitorSession' => $session,
+                    'comments' => $session->sessionComments,
+                    'canComment' => $canComment,
+                ])
+            </div>
+        @endif
+
+        <div class="modal fade" id="materialPreviewModal" tabindex="-1" aria-labelledby="materialPreviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content bg-dark text-light border border-secondary">
+                    <div class="modal-header border-secondary">
+                        <div>
+                            <h5 class="modal-title" id="materialPreviewModalLabel">Vista previa del archivo</h5>
+                            <small class="text-secondary" id="materialPreviewSubtitle"></small>
+                        </div>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body p-0">
+                        <div id="materialPreviewBody" class="bg-black" style="min-height: 55vh;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @push('scripts')
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const previewBody = document.getElementById('materialPreviewBody');
+                    const previewSubtitle = document.getElementById('materialPreviewSubtitle');
+                    const previewButtons = document.querySelectorAll('[data-material-preview]');
+
+                    previewButtons.forEach((button) => {
+                        button.addEventListener('click', function () {
+                            const url = this.dataset.url;
+                            const mime = (this.dataset.mime || '').toLowerCase();
+                            const name = this.dataset.name || 'Archivo';
+
+                            previewSubtitle.textContent = name;
+
+                            if (mime.startsWith('image/')) {
+                                previewBody.innerHTML = `
+                                    <div class="d-flex align-items-center justify-content-center p-3" style="min-height: 55vh;">
+                                        <img src="${url}" alt="${name}" class="img-fluid rounded shadow-sm" style="max-height: 55vh; object-fit: contain;">
+                                    </div>
+                                `;
+                                return;
+                            }
+
+                            if (mime === 'application/pdf' || url.toLowerCase().endsWith('.pdf')) {
+                                previewBody.innerHTML = `
+                                    <iframe src="${url}" title="${name}" style="width: 100%; height: 55vh; border: 0;"></iframe>
+                                `;
+                                return;
+                            }
+
+                            previewBody.innerHTML = `
+                                <div class="d-flex flex-column align-items-center justify-content-center gap-3 p-5 text-center" style="min-height: 55vh;">
+                                    <div class="display-6">Vista previa no disponible</div>
+                                    <p class="text-secondary mb-0">Este tipo de archivo se abrirá en una nueva pestaña para descargarlo o visualizarlo con la aplicación asociada.</p>
+                                    <a href="${url}" target="_blank" rel="noopener noreferrer" class="btn btn-outline-info rounded-pill px-4">
+                                        Abrir archivo
+                                    </a>
+                                </div>
+                            `;
+                        });
+                    });
+
+                    const previewModal = document.getElementById('materialPreviewModal');
+                    if (previewModal) {
+                        previewModal.addEventListener('hidden.bs.modal', function () {
+                            previewBody.innerHTML = '';
+                            previewSubtitle.textContent = '';
+                        });
+                    }
+                });
+            </script>
+        @endpush
+
     </div>
+
+    @include('session_comments._script')
 @endsection

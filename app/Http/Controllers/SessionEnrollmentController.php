@@ -36,11 +36,18 @@ class SessionEnrollmentController extends Controller
     public function store(Request $request, MonitorSession $monitorSession)
     {
         $user = $request->user();
+        $isAjaxRequest = $request->expectsJson() || $request->ajax();
 
         if (in_array($user->role_id, [1, 2])) {
 
-            return back()
-                ->with('error', 'Solo los estudiantes pueden inscribirse.');
+            if ($isAjaxRequest) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'Solo los estudiantes pueden inscribirse.',
+                ], 403);
+            }
+
+            return back()->with('error', 'Solo los estudiantes pueden inscribirse.');
         }
 
         $enrollment = SessionEnrollment::where('user_id', $user->id)
@@ -49,8 +56,14 @@ class SessionEnrollmentController extends Controller
 
         if ($enrollment && $enrollment->status === 'activa') {
 
-            return back()
-                ->with('warning', 'Ya estás inscrito en esta monitoría.');
+            if ($isAjaxRequest) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'Ya estás inscrito en esta monitoría.',
+                ], 409);
+            }
+
+            return back()->with('warning', 'Ya estás inscrito en esta monitoría.');
         }
 
         if ($enrollment && $enrollment->status === 'anulada') {
@@ -61,19 +74,45 @@ class SessionEnrollmentController extends Controller
                 'cancelled_at' => null,
             ]);
 
-            return back()
-                ->with('success', 'Inscripción reactivada correctamente.');
+            if ($isAjaxRequest) {
+                return response()->json([
+                    'ok' => true,
+                    'message' => 'Inscripción reactivada correctamente.',
+                    'session_id' => $monitorSession->id,
+                    'enrollment_id' => $enrollment->id,
+                    'status' => 'activa',
+                    'action_html' => view('dashboard._enrollment_action', [
+                        'sessionId' => $monitorSession->id,
+                        'enrollmentId' => $enrollment->id,
+                    ])->render(),
+                ]);
+            }
+
+            return back()->with('success', 'Inscripción reactivada correctamente.');
         }
 
-        SessionEnrollment::create([
+        $newEnrollment = SessionEnrollment::create([
             'user_id' => $user->id,
             'monitor_session_id' => $monitorSession->id,
             'status' => 'activa',
             'enrolled_at' => now(),
         ]);
 
-        return back()
-            ->with('success', 'Te has inscrito correctamente.');
+        if ($isAjaxRequest) {
+            return response()->json([
+                'ok' => true,
+                'message' => 'Te has inscrito correctamente.',
+                'session_id' => $monitorSession->id,
+                'enrollment_id' => $newEnrollment->id,
+                'status' => 'activa',
+                'action_html' => view('dashboard._enrollment_action', [
+                    'sessionId' => $monitorSession->id,
+                    'enrollmentId' => $newEnrollment->id,
+                ])->render(),
+            ]);
+        }
+
+        return back()->with('success', 'Te has inscrito correctamente.');
     }
 
     public function show(Request $request, SessionEnrollment $sessionEnrollment)
@@ -98,16 +137,23 @@ class SessionEnrollmentController extends Controller
             abort(403, 'Solo puedes ver materiales de una inscripción activa.');
         }
 
-        $sessionEnrollment->load([
-            'monitorSession.schedule.monitor.subject',
-            'monitorSession.schedule.monitor.user',
-            'user',
-            'monitorSession.sessionMaterials.uploader',
-        ]);
+        $canViewComments = $isAdmin || (int) $user->role_id === 3;
+        $canComment = (int) $user->role_id === 3;
+
+        if ($canViewComments) {
+            $sessionEnrollment->load([
+                'monitorSession.schedule.monitor.subject',
+                'monitorSession.schedule.monitor.user',
+                'user',
+                'monitorSession.sessionMaterials.uploader',
+                'monitorSession.sessionComments.user.roles',
+                'monitorSession.sessionComments.replies.user.roles',
+            ]);
+        }
 
         return view(
             'session_enrollments.show',
-            compact('sessionEnrollment')
+            compact('sessionEnrollment', 'canViewComments', 'canComment')
         );
     }
     public function exportPdf(Request $request)

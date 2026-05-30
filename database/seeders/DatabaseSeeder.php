@@ -32,6 +32,7 @@ class DatabaseSeeder extends Seeder
             
             // Nivel 4 (Dependen de Schedule)
             MonitorSessionSeeder::class,
+            SessionEnrollmentSeeder::class,
             
             // Nivel 5 (Dependen de Session)
             AttendanceSeeder::class,

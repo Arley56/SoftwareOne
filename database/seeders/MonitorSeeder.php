@@ -11,31 +11,25 @@ class MonitorSeeder extends Seeder
 {
     public function run(): void
     {
-        // Lista de correos de los monitores creados en UserSeeder
-        $emails = [
-            'juan@unal.edu.co',
-            'maria@unal.edu.co',
-            'pedro@unal.edu.co',
-            'ana@unal.edu.co',
-            'luis@unal.edu.co'
-        ];
+        $monitors = User::where('role_id', 2)->orderBy('id')->get();
+        $subjects = Subject::orderBy('id')->get();
 
-        // Obtenemos algunas materias para vincularlas (asumiendo que ya corriste SubjectSeeder)
-        $subjects = Subject::take(5)->get();
-
-        foreach ($emails as $index => $email) {
-            $user = User::where('email', $email)->first();
-            
-            // Verificamos que el usuario y la materia existan para evitar errores
-            if ($user && isset($subjects[$index])) {
-                Monitor::create([
-                    'user_id'    => $user->id,
-                    'subject_id' => $subjects[$index]->id,
-                    'semestre'   => '8',
-                ]);
-            }
+        if ($monitors->isEmpty() || $subjects->isEmpty()) {
+            $this->command->error('No hay monitores o materias registradas.');
+            return;
         }
         
-        $this->command->info('Se han vinculado 5 monitores exitosamente.');
+        foreach ($monitors as $index => $user) {
+            $subject = $subjects[$index % $subjects->count()];
+
+            Monitor::create([
+                'user_id' => $user->id,
+                'subject_id' => $subject->id,
+                'semestre' => (string) (6 + ($index % 5)),
+                'description' => 'Monitoría de prueba para ' . $subject->name,
+            ]);
+        }
+
+        $this->command->info('Se han vinculado monitores de prueba exitosamente.');
     }
 }

@@ -16,6 +16,7 @@ use App\Models\Attendance;
 use App\Models\Feedback;
 use App\Models\Role;
 use App\Models\SessionEnrollment;
+use App\Models\SessionComment;
 #[Fillable(['name', 'email', 'password', 'estado', 'photo', 'role_id', 'phone'])]
 #[Hidden(['password', 'remember_token'])]
 
@@ -68,6 +69,11 @@ class User extends Authenticatable
     public function sessionEnrollments()
     {
         return $this->hasMany(SessionEnrollment::class);
+    }
+
+    public function sessionComments()
+    {
+        return $this->hasMany(SessionComment::class);
     }
 
 

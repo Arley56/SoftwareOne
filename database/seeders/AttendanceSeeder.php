@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Attendance;
 use App\Models\MonitorSession;
 use App\Models\User;
+use App\Models\SessionEnrollment;
 use Illuminate\Database\Seeder;
 
 class AttendanceSeeder extends Seeder
@@ -14,16 +15,40 @@ class AttendanceSeeder extends Seeder
      */
     public function run(): void
     {
-        $attendances = [];
-        for ($i = 1; $i <= 30; $i++) {
-            $attendances[] = [
-                'monitor_session_id' => $i,
-                'user_id' => rand(6, 10), // IDs de los estudiantes creados en UserSeeder
-                'asistio' => ($i % 3 == 0) ? 'No' : 'Sí'
-            ];
+        $enrollments = SessionEnrollment::with('monitorSession')
+            ->where('status', 'activa')
+            ->orderBy('monitor_session_id')
+            ->get();
+
+        if ($enrollments->isEmpty()) {
+            $students = User::where('role_id', 3)->orderBy('id')->get();
+            $sessions = MonitorSession::orderBy('id')->get();
+
+            if ($students->isEmpty() || $sessions->isEmpty()) {
+                $this->command->error('No hay datos suficientes para generar asistencias.');
+                return;
+            }
+
+            foreach ($sessions as $index => $session) {
+                Attendance::create([
+                    'monitor_session_id' => $session->id,
+                    'user_id' => $students[$index % $students->count()]->id,
+                    'asistio' => ($index % 3 === 0) ? 'No' : 'Sí',
+                ]);
+            }
+
+            $this->command->info('Se generaron asistencias de prueba con estudiantes rotativos.');
+            return;
         }
-        foreach ($attendances as $item) {
-            Attendance::create($item);
+
+        foreach ($enrollments as $index => $enrollment) {
+            Attendance::create([
+                'monitor_session_id' => $enrollment->monitor_session_id,
+                'user_id' => $enrollment->user_id,
+                'asistio' => ($index % 4 === 0) ? 'No' : 'Sí',
+            ]);
         }
+
+        $this->command->info('Se generaron asistencias de prueba basadas en inscripciones activas.');
     }
 }
