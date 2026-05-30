@@ -82,10 +82,10 @@
                             @auth
                                 <a href="{{ url('/dashboard') }}" class="btn btn-outline-light btn-sm rounded-pill px-3">Dashboard</a>
                             @else
-                                <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm rounded-pill px-3">Log in</a>
+                                <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm rounded-pill px-3">Iniciar</a>
 
                                 @if (Route::has('register'))
-                                    <a href="{{ route('register') }}" class="btn btn-warning btn-sm rounded-pill px-3 text-dark">Register</a>
+                                    <a href="{{ route('register') }}" class="btn btn-warning btn-sm rounded-pill px-3 text-dark">Registrarse</a>
                                 @endif
                             @endauth
                         </div>

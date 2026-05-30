@@ -128,6 +128,59 @@
             window.initDashboardSessions = function (root) {
                 const scope = root || document;
                 const dashboardFeedback = document.getElementById('dashboard-feedback');
+                const dashboardWrapper = document.getElementById('dashboard-sessions-wrapper');
+                const storageKey = 'dashboard-session-scroll-y';
+
+                function getBaseUrl() {
+                    const filterForm = document.getElementById('dashboard-filters');
+                    return filterForm ? filterForm.action : "{{ route('dashboard') }}";
+                }
+
+                function saveScrollPosition() {
+                    sessionStorage.setItem(storageKey, String(window.scrollY || window.pageYOffset || 0));
+                }
+
+                function restoreScrollPosition() {
+                    const savedScrollY = sessionStorage.getItem(storageKey);
+
+                    if (savedScrollY !== null) {
+                        window.scrollTo({ top: Number(savedScrollY), behavior: 'auto' });
+                        sessionStorage.removeItem(storageKey);
+                    }
+                }
+
+                async function loadDashboardSessions(url) {
+                    if (!dashboardWrapper) {
+                        window.location.href = url;
+                        return;
+                    }
+
+                    saveScrollPosition();
+
+                    const response = await fetch(url, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'Accept': 'application/json',
+                        },
+                    });
+
+                    const payload = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(payload?.message || 'No fue posible actualizar las monitorías.');
+                    }
+
+                    if (payload.html) {
+                        dashboardWrapper.innerHTML = payload.html;
+                        window.initDashboardSessions(dashboardWrapper);
+                    }
+
+                    if (payload.url) {
+                        window.history.replaceState({}, '', payload.url);
+                    }
+
+                    restoreScrollPosition();
+                }
 
                 function showDashboardAlert(type, message) {
                     if (!dashboardFeedback) {
@@ -148,39 +201,45 @@
 
                     filterForm.addEventListener('submit', async function (event) {
                         event.preventDefault();
-
-                        const wrapper = document.getElementById('dashboard-sessions-wrapper');
-                        const previousScrollY = window.scrollY || window.pageYOffset;
                         const formData = new FormData(filterForm);
                         const queryString = new URLSearchParams(formData).toString();
-                        const targetUrl = queryString ? `${filterForm.action}?${queryString}` : filterForm.action;
-
                         try {
-                            const response = await fetch(targetUrl, {
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                    'Accept': 'application/json',
-                                },
-                            });
-
-                            const payload = await response.json();
-
-                            if (!response.ok) {
-                                throw new Error(payload?.message || 'No fue posible filtrar las monitorías.');
-                            }
-
-                            if (wrapper && payload.html) {
-                                wrapper.innerHTML = payload.html;
-                                window.initDashboardSessions(wrapper);
-                            }
-
-                            if (payload.url) {
-                                window.history.replaceState({}, '', payload.url);
-                            }
-
-                            window.scrollTo({ top: previousScrollY, behavior: 'auto' });
+                            const targetUrl = queryString ? `${filterForm.action}?${queryString}` : filterForm.action;
+                            await loadDashboardSessions(targetUrl);
                         } catch (error) {
                             showDashboardAlert('warning', error.message || 'No fue posible filtrar las monitorías.');
+                        }
+                    });
+                }
+
+                if (!window.dashboardSessionsNavigationBound) {
+                    window.dashboardSessionsNavigationBound = true;
+
+                    document.addEventListener('click', function (event) {
+                        const target = event.target;
+
+                        if (!(target instanceof Element)) {
+                            return;
+                        }
+
+                        const resetButton = target.closest('#dashboard-reset');
+                        if (resetButton) {
+                            event.preventDefault();
+
+                            loadDashboardSessions(getBaseUrl()).catch(function (error) {
+                                showDashboardAlert('warning', error.message || 'No fue posible limpiar el filtro.');
+                            });
+
+                            return;
+                        }
+
+                        const paginationLink = target.closest('#dashboard-sessions-wrapper .pagination a');
+                        if (paginationLink) {
+                            event.preventDefault();
+
+                            loadDashboardSessions(paginationLink.href).catch(function (error) {
+                                showDashboardAlert('warning', error.message || 'No fue posible cargar la página solicitada.');
+                            });
                         }
                     });
                 }

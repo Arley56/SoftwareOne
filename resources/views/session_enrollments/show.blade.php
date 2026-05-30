@@ -15,33 +15,35 @@
         </div>
     </x-slot>
 
-    <div class="card border-0 shadow-sm bg-dark text-light mb-4">
+    <div class="row g-4 align-items-stretch mb-4">
+        <div class="col-12 col-lg-8">
+            <div class="card border-0 shadow-sm bg-dark text-light h-100">
 
-        <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2 border-secondary">
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2 border-secondary">
 
-            <h4 class="mb-0">
-                Inscripción #{{ $sessionEnrollment->id }}
-            </h4>
+                    <h4 class="mb-0">
+                        Inscripción #{{ $sessionEnrollment->id }}
+                    </h4>
 
-            @if ($sessionEnrollment->status === 'activa')
+                    @if ($sessionEnrollment->status === 'activa')
 
-                <span class="badge text-bg-success">
-                    Activa
-                </span>
+                        <span class="badge text-bg-success">
+                            Activa
+                        </span>
 
-            @else
+                    @else
 
-                <span class="badge text-bg-secondary">
-                    Anulada
-                </span>
+                        <span class="badge text-bg-secondary">
+                            Anulada
+                        </span>
 
-            @endif
+                    @endif
 
-        </div>
+                </div>
 
-        <div class="card-body">
+                <div class="card-body">
 
-            <div class="row g-4">
+                    <div class="row g-4">
 
                 <div class="col-md-6">
 
@@ -117,11 +119,11 @@
 
                 </div>
 
-            </div>
+                    </div>
 
-        </div>
+                </div>
 
-        <div class="card-footer d-flex gap-2 flex-wrap border-secondary">
+                <div class="card-footer d-flex gap-2 flex-wrap border-secondary">
 
             @if ($sessionEnrollment->status === 'activa' && auth()->id() === $sessionEnrollment->user_id)
 
@@ -145,8 +147,20 @@
 
             @endif
 
+                </div>
+
+            </div>
         </div>
 
+        <div class="col-12 col-lg-4">
+            @if ($canViewAnnouncements)
+                @include('session_announcements._panel', [
+                    'monitorSession' => $sessionEnrollment->monitorSession,
+                    'announcements' => $sessionEnrollment->monitorSession->sessionAnnouncements,
+                    'canAnnounce' => false,
+                ])
+            @endif
+        </div>
     </div>
 
     {{-- SUBIR EJERCICIO --}}

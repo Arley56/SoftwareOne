@@ -7,6 +7,7 @@ use App\Http\Controllers\MonitorDashboardController;
 use App\Http\Controllers\MonitorSessionController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\SessionCommentController;
+use App\Http\Controllers\SessionAnnouncementController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\RoleController;
@@ -35,6 +36,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Comentarios de sesión compartidos entre estudiantes inscritos y monitor asociado
     Route::post('monitor-sessions/{monitorSession}/comments', [SessionCommentController::class, 'store'])
         ->name('monitor-sessions.comments.store');
+
+    // Anuncios de sesión compartidos entre monitor y estudiantes
+    Route::post('monitor-sessions/{monitorSession}/announcements', [SessionAnnouncementController::class, 'store'])
+        ->middleware('role:2')
+        ->name('monitor-sessions.announcements.store');
 
     // Rutas SOLO para MONITOR (role_id == 2)
     Route::middleware('role:2')->group(function () {

@@ -139,6 +139,7 @@ class SessionEnrollmentController extends Controller
 
         $canViewComments = $isAdmin || (int) $user->role_id === 3;
         $canComment = (int) $user->role_id === 3;
+        $canViewAnnouncements = $isAdmin || (int) $user->role_id === 3;
 
         if ($canViewComments) {
             $sessionEnrollment->load([
@@ -148,12 +149,13 @@ class SessionEnrollmentController extends Controller
                 'monitorSession.sessionMaterials.uploader',
                 'monitorSession.sessionComments.user.roles',
                 'monitorSession.sessionComments.replies.user.roles',
+                'monitorSession.sessionAnnouncements.user.roles',
             ]);
         }
 
         return view(
             'session_enrollments.show',
-            compact('sessionEnrollment', 'canViewComments', 'canComment')
+            compact('sessionEnrollment', 'canViewComments', 'canViewAnnouncements', 'canComment')
         );
     }
     public function exportPdf(Request $request)

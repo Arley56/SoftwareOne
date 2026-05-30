@@ -26,18 +26,20 @@
             @endif
         </div>
 
-        {{-- DETALLE SESIÓN --}}
-        <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-dark mb-4">
+        <div class="row g-4 align-items-stretch mb-4">
+            <div class="col-12 col-lg-8">
+                {{-- DETALLE SESIÓN --}}
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden bg-dark h-100">
 
-            <div class="card-header bg-dark border-secondary px-4 py-3">
-                <h5 class="mb-0 text-light">
-                    Tabla: Detalle de sesión
-                </h5>
-            </div>
+                    <div class="card-header bg-dark border-secondary px-4 py-3">
+                        <h5 class="mb-0 text-light">
+                            Tabla: Detalle de sesión
+                        </h5>
+                    </div>
 
-            <div class="table-responsive">
+                    <div class="table-responsive">
 
-                <table class="table table-dark table-bordered mb-0 align-middle">
+                        <table class="table table-dark table-bordered mb-0 align-middle">
 
                     <tbody>
 
@@ -126,10 +128,23 @@
 
                     </tbody>
 
-                </table>
+                        </table>
 
+                    </div>
+
+                </div>
             </div>
 
+            <div class="col-12 col-lg-4">
+                @if($canViewAnnouncements)
+                    @include('session_announcements._panel', [
+                        'monitorSession' => $session,
+                        'announcements' => $session->sessionAnnouncements,
+                        'canAnnounce' => $canAnnounce,
+                        'compact' => true,
+                    ])
+                @endif
+            </div>
         </div>
 
         {{-- CARGAR MATERIAL --}}

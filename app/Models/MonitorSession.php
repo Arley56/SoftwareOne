@@ -11,6 +11,7 @@ use App\Models\Attendance;
 use App\Models\SessionEnrollment;
 use App\Models\SessionMaterial;
 use App\Models\SessionComment;
+use App\Models\SessionAnnouncement;
 
 class MonitorSession extends Model
 {
@@ -44,6 +45,12 @@ class MonitorSession extends Model
     {
         return $this->hasMany(SessionComment::class)
             ->whereNull('parent_id')
+            ->latest();
+    }
+
+    public function sessionAnnouncements()
+    {
+        return $this->hasMany(SessionAnnouncement::class)
             ->latest();
     }
 

@@ -47,6 +47,7 @@ class MonitorSessionController extends Controller
                     ]);
             },
             'sessionMaterials.uploader',
+            'sessionAnnouncements.user.roles',
         ])->findOrFail($id);
 
         $isAdmin = (int) $user->role_id === 1;
@@ -54,7 +55,9 @@ class MonitorSessionController extends Controller
             && (int) ($session->schedule->monitor->user_id ?? 0) === (int) $user->id;
 
         $canViewComments = $isAdmin || $isOwnerMonitor;
+        $canViewAnnouncements = $isAdmin || $isOwnerMonitor;
         $canComment = $isOwnerMonitor;
+        $canAnnounce = $isOwnerMonitor;
 
         if ($canViewComments) {
             $session->load([
@@ -63,7 +66,7 @@ class MonitorSessionController extends Controller
             ]);
         }
 
-        return view('monitor_sessions.show', compact('session', 'canViewComments', 'canComment'));
+        return view('monitor_sessions.show', compact('session', 'canViewComments', 'canViewAnnouncements', 'canComment', 'canAnnounce'));
     }
 
     public function destroyMaterial(Request $request, MonitorSession $monitorSession, SessionMaterial $sessionMaterial)
