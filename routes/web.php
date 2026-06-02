@@ -16,6 +16,7 @@ use App\Http\Controllers\SessionEnrollmentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ReportController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -53,6 +54,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::resource('roles', RoleController::class);
         Route::resource('users', UserController::class);
         Route::resource('subjects', SubjectController::class);
+
+        Route::get(
+            '/reportes/monitorias',
+            [ReportController::class, 'export']
+        )->name('reportes.monitorias');
     });
 
     // Rutas para ADMIN y MONITOR (role_id == 1 o 2)
@@ -77,7 +83,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::delete('session-enrollments/{sessionEnrollment}', [SessionEnrollmentController::class, 'destroy'])
             ->name('session-enrollments.destroy');
         Route::post(
-            'session-enrollments/{sessionEnrollment}/upload-exercise',[SessionEnrollmentController::class, 'uploadExercise'])
+            'session-enrollments/{sessionEnrollment}/upload-exercise',
+            [SessionEnrollmentController::class, 'uploadExercise']
+        )
             ->name('session-enrollments.upload-exercise');
         Route::post(
             'session-enrollments/{id}/upload-file',
@@ -90,4 +98,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
+
